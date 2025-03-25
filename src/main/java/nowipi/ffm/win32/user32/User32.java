@@ -5,7 +5,6 @@ import java.lang.foreign.Linker;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.SymbolLookup;
 import java.lang.invoke.MethodHandle;
-import java.nio.charset.StandardCharsets;
 
 public class User32 {
 
@@ -128,10 +127,27 @@ public class User32 {
         }
     }
 
-    public static MemorySegment toUTF16CString(String str) {
-        byte[] bytes = (str + "\0").getBytes(StandardCharsets.UTF_16LE); // Ensure UTF-16LE with null terminator
-        MemorySegment segment = arena.allocate(bytes.length); // Allocate memory
-        segment.copyFrom(MemorySegment.ofArray(bytes)); // Copy bytes into native memory
-        return segment; // Return pointer to native string
+    public static int destroyWindow(MemorySegment hWnd) {
+        try {
+            return (int) DestroyWindow.handle.invokeExact(hWnd);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static MemorySegment getDC(MemorySegment hWnd) {
+        try {
+            return (MemorySegment) GetDC.handle.invokeExact(hWnd);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static int releaseDC(MemorySegment hWnd, MemorySegment hDC) {
+        try {
+            return (int) ReleaseDC.handle.invokeExact(hWnd, hDC);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
     }
 }

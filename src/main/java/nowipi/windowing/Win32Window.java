@@ -12,6 +12,7 @@ import java.lang.foreign.MemorySegment;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
+import java.nio.charset.StandardCharsets;
 
 import static nowipi.ffm.win32.user32.User32.*;
 
@@ -20,9 +21,11 @@ public class Win32Window extends Window {
     private static final MemorySegment CLASS_NAME;
 
     private final MemorySegment hWnd;
+    private final MemorySegment hDC;
+    private final MemorySegment hRC;
 
     static {
-        CLASS_NAME = User32.toUTF16CString("Better Java Gui");
+        CLASS_NAME = arena.allocateFrom("Better Java Gui", StandardCharsets.UTF_16LE);
         MemorySegment wc = WNDCLASSW.allocate(arena);
         WNDCLASSW.setLpszClassName(wc, CLASS_NAME);
         try {
@@ -51,7 +54,7 @@ public class Win32Window extends Window {
         hWnd = User32.createWindowExW(
                 0,
                 CLASS_NAME,
-                User32.toUTF16CString(title),
+                arena.allocateFrom(title, StandardCharsets.UTF_16LE),
                 WS_OVERLAPPEDWINDOW,
                 CW_USEDEFAULT, CW_USEDEFAULT, width, height,
                 MemorySegment.NULL,
@@ -64,12 +67,12 @@ public class Win32Window extends Window {
             throw new RuntimeException("Failed to create window");
         }
 
-        MemorySegment hDC = GDI32.getDC(hWnd);
+        hDC = User32.getDC(hWnd);
 
         MemorySegment pfd = PIXELFORMATDESCRIPTOR.allocate(arena);
         PIXELFORMATDESCRIPTOR.setNSize(pfd, (short) pfd.byteSize());
         PIXELFORMATDESCRIPTOR.setNVersion(pfd, (short) 1);
-        PIXELFORMATDESCRIPTOR.setDwFlags(pfd, GDI32.PFD_DRAW_TO_WINDOW | GDI32.PFD_SUPPORT_OPENGL);
+        PIXELFORMATDESCRIPTOR.setDwFlags(pfd, GDI32.PFD_DRAW_TO_WINDOW | GDI32.PFD_SUPPORT_OPENGL | GDI32.PFD_DOUBLEBUFFER);
         PIXELFORMATDESCRIPTOR.setIPixelType(pfd, GDI32.PFD_TYPE_RGBA);
         PIXELFORMATDESCRIPTOR.setCColorBits(pfd, (byte) 32);
 
@@ -85,7 +88,7 @@ public class Win32Window extends Window {
         GDI32.describePixelFormat(hDC, pf, (int) PIXELFORMATDESCRIPTOR.sizeof(), pfd);
 
 
-        MemorySegment hRC = Opengl32.wglCreateContext(hDC);
+        hRC = Opengl32.wglCreateContext(hDC);
         Opengl32.wglMakeCurrent(hDC, hRC);
 
         User32.showWindow(hWnd, SW_SHOW);
@@ -107,6 +110,11 @@ public class Win32Window extends Window {
         }
     }
 
+    @Override
+    public void swapBuffers() {
+        GDI32.swapBuffers(hDC);
+    }
+
     private static long windowProc(MemorySegment hwnd, int uMsg, long wParam, long lParam) {
         switch (uMsg){
             case WM_PAINT:
@@ -117,4 +125,11 @@ public class Win32Window extends Window {
         }
     }
 
+    @Override
+    public void close() {
+        Opengl32.wglMakeCurrent(MemorySegment.NULL, MemorySegment.NULL);
+        Opengl32.wglDeleteContext(hRC);
+        User32.releaseDC(hWnd, hDC);
+        User32.destroyWindow(hWnd);
+    }
 }

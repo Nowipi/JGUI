@@ -1,7 +1,6 @@
-package nowipi.ffm.win32.gdi;
+package nowipi.ffm.win32.user32;
 
 import nowipi.ffm.c.C;
-import nowipi.ffm.win32.user32.User32;
 
 import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.Linker;
