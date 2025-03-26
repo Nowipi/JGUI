@@ -6,6 +6,8 @@ import nowipi.ffm.win32.wgl.Opengl32;
 
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import static nowipi.ffm.win32.user32.User32.arena;
@@ -1839,9 +1841,273 @@ public final class OpenGL {
         }
     }
 
+    private static final FunctionDescriptor glCreateShaderDescriptor = FunctionDescriptor.of(C.INT, C.INT);
+    public static int glCreateShader(int type) {
+        try {
+            return (int) getMethodHandle("glCreateShader", glCreateShaderDescriptor).invokeExact(type);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final FunctionDescriptor glShaderSourceDescriptor = FunctionDescriptor.ofVoid(C.INT, C.INT, C.POINTER, C.POINTER);
+    public static void glShaderSource(int shader, int count, MemorySegment string, MemorySegment length) {
+        try {
+            getMethodHandle("glShaderSource", glShaderSourceDescriptor).invokeExact(shader, count, string, length);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void glShaderSource(int shader, String string) {
+        MemorySegment stringPointer = arena.allocateFrom(C.POINTER, arena.allocateFrom(string));
+        glShaderSource(shader, 1, stringPointer, MemorySegment.NULL);
+    }
+
+    private static final FunctionDescriptor glCompileShaderDescriptor = FunctionDescriptor.ofVoid(C.INT);
+    public static void glCompileShader(int shader) {
+        try {
+            getMethodHandle("glCompileShader", glCompileShaderDescriptor).invokeExact(shader);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final FunctionDescriptor glCreateProgramDescriptor = FunctionDescriptor.of(C.INT);
+    public static int glCreateProgram() {
+        try {
+            return (int) getMethodHandle("glCreateProgram", glCreateProgramDescriptor).invokeExact();
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final FunctionDescriptor glAttachShaderDescriptor = FunctionDescriptor.ofVoid(C.INT, C.INT);
+    public static void glAttachShader(int program, int shader) {
+        try {
+            getMethodHandle("glAttachShader", glAttachShaderDescriptor).invokeExact(program, shader);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final FunctionDescriptor glLinkProgramDescriptor = FunctionDescriptor.ofVoid(C.INT);
+    public static void glLinkProgram(int program) {
+        try {
+            getMethodHandle("glLinkProgram", glLinkProgramDescriptor).invokeExact(program);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final FunctionDescriptor glDeleteShaderDescriptor = FunctionDescriptor.ofVoid(C.INT);
+    public static void glDeleteShader(int shader) {
+        try {
+            getMethodHandle("glDeleteShader", glDeleteShaderDescriptor).invokeExact(shader);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final FunctionDescriptor glGenVertexArraysDescriptor = FunctionDescriptor.ofVoid(C.INT, C.POINTER);
+    public static void glGenVertexArrays(int n, MemorySegment arrays) {
+        try {
+            getMethodHandle("glGenVertexArrays", glGenVertexArraysDescriptor).invokeExact(n, arrays);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static int glGenVertexArrays() {
+        MemorySegment array = arena.allocate(C.INT);
+        glGenVertexArrays(1, array);
+        return array.get(C.INT, 0);
+    }
+
+    private static final FunctionDescriptor glGenBuffersDescriptor = FunctionDescriptor.ofVoid(C.INT, C.POINTER);
+    public static void glGenBuffers(int n, MemorySegment buffers) {
+        try {
+            getMethodHandle("glGenBuffers", glGenBuffersDescriptor).invokeExact(n, buffers);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static int glGenBuffers() {
+        MemorySegment buffer = arena.allocateFrom(C.POINTER, arena.allocateFrom(C.INT));
+        glGenBuffers(1, buffer);
+        return buffer.get(C.INT, 0);
+    }
+
+    private static final FunctionDescriptor glBindVertexArrayDescriptor = FunctionDescriptor.ofVoid(C.INT);
+    public static void glBindVertexArray(int array) {
+        try {
+            getMethodHandle("glBindVertexArray", glBindVertexArrayDescriptor).invokeExact(array);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final FunctionDescriptor glVertexAttribPointerDescriptor = FunctionDescriptor.ofVoid(C.INT, C.INT, C.INT, C.INT, C.INT, C.POINTER);
+    public static void glVertexAttribPointer(int index, int size, int type, int normalized, int stride, MemorySegment pointer) {
+        try {
+            getMethodHandle("glVertexAttribPointer", glVertexAttribPointerDescriptor).invokeExact(index, size, type, normalized, stride, pointer);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final FunctionDescriptor glEnableVertexAttribArrayDescriptor = FunctionDescriptor.ofVoid(C.INT);
+    public static void glEnableVertexAttribArray(int index) {
+        try {
+            getMethodHandle("glEnableVertexAttribArray", glEnableVertexAttribArrayDescriptor).invokeExact(index);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final FunctionDescriptor glBindBufferDescriptor = FunctionDescriptor.ofVoid(C.INT, C.INT);
+    public static void glBindBuffer(int target, int buffer) {
+        try {
+            getMethodHandle("glBindBuffer", glBindBufferDescriptor).invokeExact(target, buffer);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final FunctionDescriptor glBufferDataDescriptor = FunctionDescriptor.ofVoid(C.INT, C.INT, C.POINTER, C.INT);
+    public static void glBufferData(int target, int size, MemorySegment data, int usage) {
+        try {
+            getMethodHandle("glBufferData", glBufferDataDescriptor).invokeExact(target, size, data, usage);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void glBufferData(int target, float[] data, int usage) {
+        glBufferData(target, data.length * Float.BYTES, arena.allocateFrom(C.FLOAT, data), usage);
+    }
+
+    public static void glBufferData(int target, int[] data, int usage) {
+        glBufferData(target, data.length * Integer.BYTES, arena.allocateFrom(C.INT, data), usage);
+    }
+
+    private static final FunctionDescriptor glUseProgramDescriptor = FunctionDescriptor.ofVoid(C.INT);
+    public static void glUseProgram(int program) {
+        try {
+            getMethodHandle("glUseProgram", glUseProgramDescriptor).invokeExact(program);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final FunctionDescriptor glDrawElementsDescriptor = FunctionDescriptor.ofVoid(C.INT, C.INT, C.INT, C.POINTER);
+    public static void glDrawElements(int mode, int count, int type, MemorySegment indices) {
+        try {
+            getMethodHandle("glDrawElements", glDrawElementsDescriptor).invokeExact(mode, count, type, indices);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final FunctionDescriptor glDeleteVertexArraysDescriptor = FunctionDescriptor.ofVoid(C.INT, C.POINTER);
+    public static void glDeleteVertexArrays(int n, MemorySegment arrays) {
+        try {
+            getMethodHandle("glDeleteVertexArrays", glDeleteVertexArraysDescriptor).invokeExact(n, arrays);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void glDeleteVertexArrays(int array) {
+        glDeleteVertexArrays(1, arena.allocateFrom(C.INT, array));
+    }
+
+    private static final FunctionDescriptor glDeleteBuffersDescriptor = FunctionDescriptor.ofVoid(C.INT, C.POINTER);
+    public static void glDeleteBuffers(int n, MemorySegment buffers) {
+        try {
+            getMethodHandle("glDeleteBuffers", glDeleteBuffersDescriptor).invokeExact(n, buffers);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void glDeleteBuffers(int buffer) {
+        glDeleteBuffers(1, arena.allocateFrom(C.INT, buffer));
+    }
+
+    private static final FunctionDescriptor glDeleteProgramDescriptor = FunctionDescriptor.ofVoid(C.INT);
+    public static void glDeleteProgram(int program) {
+        try {
+            getMethodHandle("glDeleteProgram", glDeleteProgramDescriptor).invokeExact(program);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final FunctionDescriptor glGetShaderivDescriptor = FunctionDescriptor.ofVoid(C.INT, C.INT, C.POINTER);
+    public static void glGetShaderiv(int shader, int pname, MemorySegment params) {
+        try {
+            getMethodHandle("glGetShaderiv", glGetShaderivDescriptor).invokeExact(shader, pname, params);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static boolean glGetShaderCompileStatus(int shader) {
+        MemorySegment success = arena.allocate(C.INT);
+        glGetShaderiv(shader, GL_COMPILE_STATUS, success);
+        return success.get(C.INT, 0) != 0;
+    }
+
+    private static final FunctionDescriptor glGetShaderInfoLogDescriptor = FunctionDescriptor.ofVoid(C.INT, C.INT, C.POINTER, C.POINTER);
+    public static void glGetShaderInfoLog(int shader, int maxLength, MemorySegment length, MemorySegment infoLog) {
+        try {
+            getMethodHandle("glGetShaderInfoLog", glGetShaderInfoLogDescriptor).invokeExact(shader, maxLength, length, infoLog);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static String glGetShaderInfoLog(int shader, int maxLength) {
+        MemorySegment infoLog = arena.allocateFrom(C.CHAR, new byte[maxLength]);
+        glGetShaderInfoLog(shader, maxLength, arena.allocateFrom(C.INT, 0), infoLog);
+        return infoLog.getString(0);
+    }
+
+    private static final FunctionDescriptor glGetProgramivDescriptor = FunctionDescriptor.ofVoid(C.INT, C.INT, C.POINTER);
+    public static void glGetProgramiv(int program, int pname, MemorySegment params) {
+        try {
+            getMethodHandle("glGetProgramiv", glGetProgramivDescriptor).invokeExact(program, pname, params);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static boolean glGetProgramLinkStatus(int program) {
+        MemorySegment success = arena.allocate(C.INT);
+        glGetProgramiv(program, GL_LINK_STATUS, success);
+        return success.get(C.INT, 0) != 0;
+    }
+
+    private static final FunctionDescriptor glGetProgramInfoLogDescriptor = FunctionDescriptor.ofVoid(C.INT, C.INT, C.POINTER, C.POINTER);
+    public static void glGetProgramInfoLog(int program, int maxLength, MemorySegment length, MemorySegment infoLog) {
+        try {
+            getMethodHandle("glGetProgramInfoLog", glGetProgramInfoLogDescriptor).invokeExact(program, maxLength, length, infoLog);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static String glGetProgramInfoLog(int program, int maxLength) {
+        MemorySegment infoLog = arena.allocateFrom(C.CHAR, new byte[maxLength]);
+        glGetProgramInfoLog(program, maxLength, arena.allocateFrom(C.INT, 0), infoLog);
+        return infoLog.getString(0);
+    }
+
     //From: https://github.com/FDoKE/opengl-ffm/blob/master/src/main/java/ru/fdoke/ffm/opengl/api/opengl/OpenglApi.java
     private static final Map<String, MethodHandle> methodHandles = new HashMap<>();
-    private static MethodHandle getMethodHandle(String methodName, FunctionDescriptor descriptor) throws Throwable {
+    private static MethodHandle getMethodHandle(String methodName, FunctionDescriptor descriptor) {
         MethodHandle cachedHandle = methodHandles.get(methodName);
         if (cachedHandle != null) {
             return cachedHandle;

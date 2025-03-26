@@ -9,8 +9,9 @@ class TestApp {
         Window window = new Win32Window("Hello, Window!", 1080, 650);
 
         while (!window.shouldClose()) {
+
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            glClearColor(1, 1, 1, 1);
+            glClearColor(1, 1, 0, 1);
 
             window.swapBuffers();
 
