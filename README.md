@@ -8,7 +8,8 @@ A single-threaded Java GUI library using Java [FFM](https://docs.oracle.com/en/j
 - No magic
 ## Implementations
 Currently, only Windows is supported via the [Win32 library](https://nl.wikipedia.org/wiki/Windows_API).
-## Basic Window Example
+## Examples
+### Basic Window Example
 ```Java
 class TestApp {
 
@@ -22,7 +23,7 @@ class TestApp {
 
 }
 ````
-## Hello Traingle Example
+### Hello Traingle Example
 ```Java
 class HelloTriangle {
 
