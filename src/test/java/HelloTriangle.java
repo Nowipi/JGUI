@@ -1,14 +1,13 @@
-import nowipi.ffm.win32.wgl.Opengl32;
-import nowipi.windowing.GraphicsContext;
-import nowipi.windowing.OpenGL;
-import nowipi.windowing.win32.WGLGraphicsContext;
-import nowipi.windowing.win32.Win32DrawingSurface;
+import nowipi.rendering.GraphicsContext;
+import nowipi.rendering.OpenGL;
+import nowipi.rendering.WGLGraphicsContext;
+import nowipi.windowing.win32.GDIDrawingSurface;
 import nowipi.windowing.win32.Win32Window;
 import nowipi.windowing.Window;
 
 import java.lang.foreign.MemorySegment;
 
-import static nowipi.windowing.OpenGL.*;
+import static nowipi.rendering.OpenGL.*;
 
 class HelloTriangle {
 
@@ -22,7 +21,7 @@ class HelloTriangle {
 
         Window window = new Win32Window("Hello, Window!", SCR_WIDTH, SCR_HEIGHT);
 
-        GraphicsContext<Win32DrawingSurface> gc = new WGLGraphicsContext((Win32DrawingSurface) window.getDrawingSurface());
+        GraphicsContext<GDIDrawingSurface> gc = new WGLGraphicsContext((GDIDrawingSurface) window.getDrawingSurface());
         gc.makeCurrent();
 
         int vertexShader = glCreateShader(GL_VERTEX_SHADER);

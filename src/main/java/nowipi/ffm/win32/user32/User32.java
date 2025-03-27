@@ -1,12 +1,13 @@
 package nowipi.ffm.win32.user32;
 
-import java.lang.foreign.Arena;
+import nowipi.ffm.win32.Win32;
+
 import java.lang.foreign.Linker;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.SymbolLookup;
 import java.lang.invoke.MethodHandle;
 
-public class User32 {
+public final class User32 {
 
     public static final int WS_OVERLAPPEDWINDOW = 0x00C00000 | 0x00080000 | 0x00040000 | 0x00020000 | 0x00010000;
     public static final int CW_USEDEFAULT = 0x80000000;
@@ -24,14 +25,14 @@ public class User32 {
 
     public static final MemorySegment IDC_ARROW = MemorySegment.ofAddress(32512L);
 
-    public static final Arena arena;
     public static final SymbolLookup lookup;
 
     static {
-        arena = Arena.ofConfined();
-        lookup = SymbolLookup.libraryLookup(System.mapLibraryName("user32"), arena);
+        lookup = SymbolLookup.libraryLookup(System.mapLibraryName("user32"), Win32.arena);
     }
 
+    private User32() {
+    }
 
     public static short registerClassW(MemorySegment wndClass) {
         try {
@@ -100,7 +101,7 @@ public class User32 {
     }
 
     public static MemorySegment getWndProcUpCall(MethodHandle wndProc) {
-        return Linker.nativeLinker().upcallStub(wndProc, DefWindowProcW.descriptor, arena);
+        return Linker.nativeLinker().upcallStub(wndProc, DefWindowProcW.descriptor, Win32.arena);
     }
 
     public static boolean IsWindowVisible(MemorySegment hWnd) {

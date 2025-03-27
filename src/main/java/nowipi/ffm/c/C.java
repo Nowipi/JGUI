@@ -16,4 +16,7 @@ public class C {
             .withTargetLayout(MemoryLayout.sequenceLayout(Long.MAX_VALUE, JAVA_BYTE));
     public static final ValueLayout.OfInt LONG = ValueLayout.JAVA_INT;
     public static final ValueLayout.OfDouble LONG_DOUBLE = ValueLayout.JAVA_DOUBLE;
+
+    private C() {
+    }
 }

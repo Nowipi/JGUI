@@ -6,7 +6,7 @@ import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.Linker;
 import java.lang.invoke.MethodHandle;
 
-public class GetProcAddress {
+final class GetProcAddress {
 
     public static final FunctionDescriptor descriptor = FunctionDescriptor.of(C.POINTER,
             C.POINTER

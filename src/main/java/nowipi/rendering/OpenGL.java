@@ -1,13 +1,11 @@
-package nowipi.windowing;
+package nowipi.rendering;
 
 import nowipi.ffm.c.C;
-import nowipi.ffm.win32.wgl.Opengl32;
-import nowipi.windowing.win32.WGLGraphicsContext;
+import nowipi.windowing.OpenGLImplementation;
 
+import java.lang.foreign.Arena;
 import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.MemorySegment;
-
-import static nowipi.ffm.win32.user32.User32.arena;
 
 public final class OpenGL {
 
@@ -1870,8 +1868,10 @@ public final class OpenGL {
     }
 
     public static void glShaderSource(int shader, String string) {
-        MemorySegment stringPointer = arena.allocateFrom(C.POINTER, arena.allocateFrom(string));
-        glShaderSource(shader, 1, stringPointer, MemorySegment.NULL);
+        try(var arena = Arena.ofConfined()) {
+            MemorySegment stringPointer = arena.allocateFrom(C.POINTER, arena.allocateFrom(string));
+            glShaderSource(shader, 1, stringPointer, MemorySegment.NULL);
+        }
     }
 
     private static final FunctionDescriptor glCompileShaderDescriptor = FunctionDescriptor.ofVoid(C.INT);
@@ -1929,9 +1929,11 @@ public final class OpenGL {
     }
 
     public static int glGenVertexArrays() {
-        MemorySegment array = arena.allocate(C.INT);
-        glGenVertexArrays(1, array);
-        return array.get(C.INT, 0);
+        try(var arena = Arena.ofConfined()) {
+            MemorySegment array = arena.allocate(C.INT);
+            glGenVertexArrays(1, array);
+            return array.get(C.INT, 0);
+        }
     }
 
     private static final FunctionDescriptor glGenBuffersDescriptor = FunctionDescriptor.ofVoid(C.INT, C.POINTER);
@@ -1944,9 +1946,11 @@ public final class OpenGL {
     }
 
     public static int glGenBuffers() {
-        MemorySegment buffer = arena.allocateFrom(C.POINTER, arena.allocateFrom(C.INT));
-        glGenBuffers(1, buffer);
-        return buffer.get(C.INT, 0);
+        try(var arena = Arena.ofConfined()) {
+            MemorySegment buffer = arena.allocateFrom(C.POINTER, arena.allocateFrom(C.INT));
+            glGenBuffers(1, buffer);
+            return buffer.get(C.INT, 0);
+        }
     }
 
     private static final FunctionDescriptor glBindVertexArrayDescriptor = FunctionDescriptor.ofVoid(C.INT);
@@ -1995,11 +1999,15 @@ public final class OpenGL {
     }
 
     public static void glBufferData(int target, float[] data, int usage) {
-        glBufferData(target, data.length * Float.BYTES, arena.allocateFrom(C.FLOAT, data), usage);
+        try(var arena = Arena.ofConfined()) {
+            glBufferData(target, data.length * Float.BYTES, arena.allocateFrom(C.FLOAT, data), usage);
+        }
     }
 
     public static void glBufferData(int target, int[] data, int usage) {
-        glBufferData(target, data.length * Integer.BYTES, arena.allocateFrom(C.INT, data), usage);
+        try(var arena = Arena.ofConfined()) {
+            glBufferData(target, data.length * Integer.BYTES, arena.allocateFrom(C.INT, data), usage);
+        }
     }
 
     private static final FunctionDescriptor glUseProgramDescriptor = FunctionDescriptor.ofVoid(C.INT);
@@ -2030,7 +2038,10 @@ public final class OpenGL {
     }
 
     public static void glDeleteVertexArrays(int array) {
-        glDeleteVertexArrays(1, arena.allocateFrom(C.INT, array));
+        try(var arena = Arena.ofConfined()) {
+            glDeleteVertexArrays(1, arena.allocateFrom(C.INT, array));
+        }
+
     }
 
     private static final FunctionDescriptor glDeleteBuffersDescriptor = FunctionDescriptor.ofVoid(C.INT, C.POINTER);
@@ -2043,7 +2054,9 @@ public final class OpenGL {
     }
 
     public static void glDeleteBuffers(int buffer) {
-        glDeleteBuffers(1, arena.allocateFrom(C.INT, buffer));
+        try(var arena = Arena.ofConfined()) {
+            glDeleteBuffers(1, arena.allocateFrom(C.INT, buffer));
+        }
     }
 
     private static final FunctionDescriptor glDeleteProgramDescriptor = FunctionDescriptor.ofVoid(C.INT);
@@ -2065,9 +2078,11 @@ public final class OpenGL {
     }
 
     public static boolean glGetShaderCompileStatus(int shader) {
-        MemorySegment success = arena.allocate(C.INT);
-        glGetShaderiv(shader, GL_COMPILE_STATUS, success);
-        return success.get(C.INT, 0) != 0;
+        try(var arena = Arena.ofConfined()) {
+            MemorySegment success = arena.allocate(C.INT);
+            glGetShaderiv(shader, GL_COMPILE_STATUS, success);
+            return success.get(C.INT, 0) != 0;
+        }
     }
 
     private static final FunctionDescriptor glGetShaderInfoLogDescriptor = FunctionDescriptor.ofVoid(C.INT, C.INT, C.POINTER, C.POINTER);
@@ -2080,9 +2095,11 @@ public final class OpenGL {
     }
 
     public static String glGetShaderInfoLog(int shader, int maxLength) {
-        MemorySegment infoLog = arena.allocateFrom(C.CHAR, new byte[maxLength]);
-        glGetShaderInfoLog(shader, maxLength, arena.allocateFrom(C.INT, 0), infoLog);
-        return infoLog.getString(0);
+        try(var arena = Arena.ofConfined()) {
+            MemorySegment infoLog = arena.allocateFrom(C.CHAR, new byte[maxLength]);
+            glGetShaderInfoLog(shader, maxLength, arena.allocateFrom(C.INT, 0), infoLog);
+            return infoLog.getString(0);
+        }
     }
 
     private static final FunctionDescriptor glGetProgramivDescriptor = FunctionDescriptor.ofVoid(C.INT, C.INT, C.POINTER);
@@ -2095,9 +2112,11 @@ public final class OpenGL {
     }
 
     public static boolean glGetProgramLinkStatus(int program) {
-        MemorySegment success = arena.allocate(C.INT);
-        glGetProgramiv(program, GL_LINK_STATUS, success);
-        return success.get(C.INT, 0) != 0;
+        try(var arena = Arena.ofConfined()) {
+            MemorySegment success = arena.allocate(C.INT);
+            glGetProgramiv(program, GL_LINK_STATUS, success);
+            return success.get(C.INT, 0) != 0;
+        }
     }
 
     private static final FunctionDescriptor glGetProgramInfoLogDescriptor = FunctionDescriptor.ofVoid(C.INT, C.INT, C.POINTER, C.POINTER);
@@ -2110,8 +2129,10 @@ public final class OpenGL {
     }
 
     public static String glGetProgramInfoLog(int program, int maxLength) {
-        MemorySegment infoLog = arena.allocateFrom(C.CHAR, new byte[maxLength]);
-        glGetProgramInfoLog(program, maxLength, arena.allocateFrom(C.INT, 0), infoLog);
-        return infoLog.getString(0);
+        try(var arena = Arena.ofConfined()) {
+            MemorySegment infoLog = arena.allocateFrom(C.CHAR, new byte[maxLength]);
+            glGetProgramInfoLog(program, maxLength, arena.allocateFrom(C.INT, 0), infoLog);
+            return infoLog.getString(0);
+        }
     }
 }

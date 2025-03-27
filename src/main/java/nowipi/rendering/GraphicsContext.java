@@ -1,4 +1,7 @@
-package nowipi.windowing;
+package nowipi.rendering;
+
+import nowipi.windowing.Disposable;
+import nowipi.windowing.DrawingSurface;
 
 public abstract class GraphicsContext <DrawingSurfaceType extends DrawingSurface> implements Disposable {
 

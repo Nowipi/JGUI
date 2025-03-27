@@ -17,14 +17,16 @@ import java.nio.charset.StandardCharsets;
 
 import static nowipi.ffm.win32.user32.User32.*;
 
-public class Win32Window implements Window {
+public final class Win32Window implements Window {
 
     private static final MemorySegment CLASS_NAME;
 
+    private static final Arena arena;
     private final MemorySegment hWnd;
     private final DrawingSurface surface;
 
     static {
+        arena = Arena.ofAuto();
         CLASS_NAME = arena.allocateFrom("Better Java Gui", StandardCharsets.UTF_16LE);
         MemorySegment wc = WNDCLASSW.allocate(arena);
         WNDCLASSW.setLpszClassName(wc, CLASS_NAME);
@@ -66,7 +68,7 @@ public class Win32Window implements Window {
             throw new RuntimeException("Failed to create window");
         }
 
-        surface = new Win32DrawingSurface(hWnd);
+        surface = new GDIDrawingSurface(hWnd);
 
 
         surface.setPixelFormat(new PixelFormat(PixelFormat.ColorSpace.RGBA, 32, 24, 8));
@@ -104,27 +106,17 @@ public class Win32Window implements Window {
     }
 
     private static long windowProc(MemorySegment hwnd, int uMsg, long wParam, long lParam) {
-        switch (uMsg){
-            case WM_PAINT:
-                User32.validateRect(hwnd, MemorySegment.NULL);
-                return 0;
-            default:
-                return User32.defWindowProcW(hwnd, uMsg, wParam, lParam);
+        if (uMsg == WM_PAINT) {
+            validateRect(hwnd, MemorySegment.NULL);
+            return 0;
         }
+        return User32.defWindowProcW(hwnd, uMsg, wParam, lParam);
     }
 
     @Override
     public void dispose() {
         Opengl32.wglMakeCurrent(MemorySegment.NULL, MemorySegment.NULL);
-        try {
-            surface.close();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        surface.dispose();
         User32.destroyWindow(hWnd);
-    }
-
-    MemorySegment hWnd() {
-        return hWnd;
     }
 }

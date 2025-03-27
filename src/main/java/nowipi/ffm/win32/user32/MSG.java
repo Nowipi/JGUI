@@ -6,7 +6,7 @@ import java.lang.foreign.*;
 
 import static java.lang.foreign.MemoryLayout.PathElement.groupElement;
 
-public class MSG {
+public final class MSG {
 
     private static final GroupLayout layout = MemoryLayout.structLayout(
             C.POINTER.withName("hwnd"),

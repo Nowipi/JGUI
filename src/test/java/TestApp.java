@@ -1,9 +1,10 @@
+import nowipi.rendering.GraphicsContext;
 import nowipi.windowing.*;
-import nowipi.windowing.win32.WGLGraphicsContext;
-import nowipi.windowing.win32.Win32DrawingSurface;
+import nowipi.rendering.WGLGraphicsContext;
+import nowipi.windowing.win32.GDIDrawingSurface;
 import nowipi.windowing.win32.Win32Window;
 
-import static nowipi.windowing.OpenGL.*;
+import static nowipi.rendering.OpenGL.*;
 
 class TestApp {
 
@@ -11,7 +12,7 @@ class TestApp {
         Window window = new Win32Window("Hello, Window!", 1080, 650);
 
         DrawingSurface surface = window.getDrawingSurface();
-        GraphicsContext<Win32DrawingSurface> gc = new WGLGraphicsContext((Win32DrawingSurface) surface);
+        GraphicsContext<?> gc = new WGLGraphicsContext((GDIDrawingSurface) surface);
         gc.makeCurrent();
 
         window.show();

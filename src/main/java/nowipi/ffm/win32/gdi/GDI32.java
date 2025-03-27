@@ -1,11 +1,11 @@
 package nowipi.ffm.win32.gdi;
 
-import nowipi.ffm.win32.user32.User32;
+import nowipi.ffm.win32.Win32;
 
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.SymbolLookup;
 
-public class GDI32 {
+public final class GDI32 {
 
     public static final int PFD_SUPPORT_OPENGL = 0x00000020;
     public static final int PFD_DRAW_TO_WINDOW = 0x00000004;
@@ -14,8 +14,11 @@ public class GDI32 {
 
     public static final SymbolLookup lookup;
 
+    private GDI32() {
+    }
+
     static {
-        lookup = SymbolLookup.libraryLookup(System.mapLibraryName("gdi32"), User32.arena);
+        lookup = SymbolLookup.libraryLookup(System.mapLibraryName("gdi32"), Win32.arena);
     }
 
     public static int choosePixelFormat(MemorySegment hDC, MemorySegment hRC) {
@@ -29,14 +32,6 @@ public class GDI32 {
     public static int setPixelFormat(MemorySegment hdc, int format, MemorySegment ppfd) {
         try {
             return (int) SetPixelFormat.handle.invokeExact(hdc, format, ppfd);
-        } catch (Throwable e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static int describePixelFormat(MemorySegment hdc, int iPixelFormat, int nBytes, MemorySegment ppfd) {
-        try {
-            return (int) DescribePixelFormat.handle.invokeExact(hdc, iPixelFormat, nBytes, ppfd);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
