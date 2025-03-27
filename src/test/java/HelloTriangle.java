@@ -19,6 +19,7 @@ class HelloTriangle {
     private static final String fragmentShaderSource = "#version 330 core\nout vec4 FragColor;\nvoid main()\n{\n   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n}";
 
     public static void main(String[] args) {
+
         Window window = new Win32Window("Hello, Window!", SCR_WIDTH, SCR_HEIGHT);
 
         GraphicsContext<Win32DrawingSurface> gc = new WGLGraphicsContext((Win32DrawingSurface) window.getDrawingSurface());

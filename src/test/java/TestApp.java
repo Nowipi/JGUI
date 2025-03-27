@@ -15,7 +15,6 @@ class TestApp {
         gc.makeCurrent();
 
         window.show();
-        //RenderContext render
 
         while (!window.shouldClose()) {
 
