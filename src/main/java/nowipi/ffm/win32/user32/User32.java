@@ -21,6 +21,12 @@ public final class User32 {
     public static final int WM_PAINT = 0x000F;
     public static final int WM_KEYDOWN = 0x0100;
     public static final int WM_KEYUP = 0x0101;
+    public static final int WM_SIZING = 0x0214;
+    public static final int WM_ENTERSIZEMOVE = 0x0231;
+    public static final int WM_EXITSIZEMOVE  = 0x0232;
+
+    public static final int CS_OWNDC = 0x0020;
+
 
 
     public static final MemorySegment IDC_ARROW = MemorySegment.ofAddress(32512L);
@@ -147,6 +153,30 @@ public final class User32 {
     public static int releaseDC(MemorySegment hWnd, MemorySegment hDC) {
         try {
             return (int) ReleaseDC.handle.invokeExact(hWnd, hDC);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static MemorySegment beginPaint(MemorySegment hWnd, MemorySegment lpPaint) {
+        try {
+            return (MemorySegment) BeginPaint.handle.invokeExact(hWnd, lpPaint);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static int endPaint(MemorySegment hWnd, MemorySegment lpPaint) {
+        try {
+            return (int) EndPaint.handle.invokeExact(hWnd, lpPaint);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static int postMessageW(MemorySegment hWnd, int Msg, long wParam, long lParam) {
+        try {
+            return (int) PostMessageW.handle.invokeExact(hWnd, Msg, wParam, lParam);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }

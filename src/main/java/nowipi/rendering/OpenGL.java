@@ -2135,4 +2135,13 @@ public final class OpenGL {
             return infoLog.getString(0);
         }
     }
+
+    private static final FunctionDescriptor glViewportDescriptor = FunctionDescriptor.ofVoid(C.INT, C.INT, C.INT, C.INT);
+    public static void glViewport(int x, int y, int width, int height) {
+        try {
+            getImplementation().getMethodHandle("glViewport", glViewportDescriptor).invokeExact(x, y, width, height);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

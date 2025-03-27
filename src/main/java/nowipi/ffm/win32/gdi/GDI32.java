@@ -13,6 +13,7 @@ public final class GDI32 {
     public static final byte PFD_TYPE_RGBA = 0;
 
     public static final SymbolLookup lookup;
+    public static final int PFD_MAIN_PLANE = 0;
 
     private GDI32() {
     }

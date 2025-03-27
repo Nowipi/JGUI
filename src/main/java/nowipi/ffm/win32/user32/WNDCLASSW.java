@@ -28,6 +28,11 @@ public final class WNDCLASSW {
         return allocator.allocate(layout);
     }
 
+    public static void setStyle(MemorySegment wndClass, int style) {
+        MemoryLayout.PathElement path = groupElement("style");
+        wndClass.set(C.INT, layout.byteOffset(path), style);
+    }
+
     public static void setLpszClassName(MemorySegment wndClass, MemorySegment wndClassName) {
         MemoryLayout.PathElement path = groupElement("lpszClassName");
         wndClass.set((AddressLayout) layout.select(path), layout.byteOffset(path), wndClassName);

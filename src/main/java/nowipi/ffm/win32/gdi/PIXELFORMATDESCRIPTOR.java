@@ -65,6 +65,11 @@ public final class PIXELFORMATDESCRIPTOR {
         pfd.set((ValueLayout.OfByte) layout.select(path), layout.byteOffset(path), cColorBits);
     }
 
+    public static void setILayerType(MemorySegment pfd, byte iLayerType) {
+        MemoryLayout.PathElement path = groupElement("iLayerType");
+        pfd.set((ValueLayout.OfByte) layout.select(path), layout.byteOffset(path), iLayerType);
+    }
+
     public static long sizeof() {
         return layout.byteSize();
     }

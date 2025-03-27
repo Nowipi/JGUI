@@ -1,6 +1,8 @@
+import nowipi.event.EventListener;
 import nowipi.rendering.GraphicsContext;
 import nowipi.windowing.*;
 import nowipi.rendering.WGLGraphicsContext;
+import nowipi.windowing.event.WindowResizeEvent;
 import nowipi.windowing.win32.GDIDrawingSurface;
 import nowipi.windowing.win32.Win32Window;
 
@@ -14,6 +16,10 @@ class TestApp {
         DrawingSurface surface = window.getDrawingSurface();
         GraphicsContext<?> gc = new WGLGraphicsContext((GDIDrawingSurface) surface);
         gc.makeCurrent();
+
+        window.addListener(WindowResizeEvent.class, e -> {
+            glViewport(0, 0, e.width(), e.height());
+        });
 
         window.show();
 

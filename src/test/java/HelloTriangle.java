@@ -1,6 +1,7 @@
 import nowipi.rendering.GraphicsContext;
 import nowipi.rendering.OpenGL;
 import nowipi.rendering.WGLGraphicsContext;
+import nowipi.windowing.event.WindowResizeEvent;
 import nowipi.windowing.win32.GDIDrawingSurface;
 import nowipi.windowing.win32.Win32Window;
 import nowipi.windowing.Window;
@@ -20,6 +21,8 @@ class HelloTriangle {
     public static void main(String[] args) {
 
         Window window = new Win32Window("Hello, Window!", SCR_WIDTH, SCR_HEIGHT);
+
+        window.addListener(WindowResizeEvent.class, e -> glViewport(0, 0, e.width(), e.height()));
 
         GraphicsContext<GDIDrawingSurface> gc = new WGLGraphicsContext((GDIDrawingSurface) window.getDrawingSurface());
         gc.makeCurrent();
@@ -92,6 +95,7 @@ class HelloTriangle {
             glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, MemorySegment.NULL);
 
             window.swapBuffers();
+
             window.pollEvents();
         }
 
