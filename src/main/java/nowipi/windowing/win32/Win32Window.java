@@ -1,11 +1,12 @@
-package nowipi.windowing;
+package nowipi.windowing.win32;
 
-import nowipi.ffm.win32.gdi.GDI32;
-import nowipi.ffm.win32.gdi.PIXELFORMATDESCRIPTOR;
 import nowipi.ffm.win32.user32.MSG;
 import nowipi.ffm.win32.user32.User32;
 import nowipi.ffm.win32.user32.WNDCLASSW;
 import nowipi.ffm.win32.wgl.Opengl32;
+import nowipi.windowing.DrawingSurface;
+import nowipi.windowing.PixelFormat;
+import nowipi.windowing.Window;
 
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
@@ -16,13 +17,12 @@ import java.nio.charset.StandardCharsets;
 
 import static nowipi.ffm.win32.user32.User32.*;
 
-public class Win32Window extends Window {
+public class Win32Window implements Window {
 
     private static final MemorySegment CLASS_NAME;
 
     private final MemorySegment hWnd;
-    private final MemorySegment hDC;
-    private final MemorySegment hRC;
+    private final DrawingSurface surface;
 
     static {
         CLASS_NAME = arena.allocateFrom("Better Java Gui", StandardCharsets.UTF_16LE);
@@ -49,7 +49,6 @@ public class Win32Window extends Window {
 
 
     public Win32Window(String title, int width, int height) {
-        super(title, width, height);
 
         hWnd = User32.createWindowExW(
                 0,
@@ -67,30 +66,14 @@ public class Win32Window extends Window {
             throw new RuntimeException("Failed to create window");
         }
 
-        hDC = User32.getDC(hWnd);
-
-        MemorySegment pfd = PIXELFORMATDESCRIPTOR.allocate(arena);
-        PIXELFORMATDESCRIPTOR.setNSize(pfd, (short) pfd.byteSize());
-        PIXELFORMATDESCRIPTOR.setNVersion(pfd, (short) 1);
-        PIXELFORMATDESCRIPTOR.setDwFlags(pfd, GDI32.PFD_DRAW_TO_WINDOW | GDI32.PFD_SUPPORT_OPENGL | GDI32.PFD_DOUBLEBUFFER);
-        PIXELFORMATDESCRIPTOR.setIPixelType(pfd, GDI32.PFD_TYPE_RGBA);
-        PIXELFORMATDESCRIPTOR.setCColorBits(pfd, (byte) 32);
-
-        int pf = GDI32.choosePixelFormat(hDC, pfd);
-        if (pf == 0) {
-            throw new RuntimeException("ChoosePixelFormat() failed: Cannot find a suitable pixel format.");
-        }
-
-        if (GDI32.setPixelFormat(hDC, pf, pfd) == 0) {
-            throw new RuntimeException("SetPixelFormat() failed: Cannot set format specified.");
-        }
-
-        GDI32.describePixelFormat(hDC, pf, (int) PIXELFORMATDESCRIPTOR.sizeof(), pfd);
+        surface = new Win32DrawingSurface(hWnd);
 
 
-        hRC = Opengl32.wglCreateContext(hDC);
-        Opengl32.wglMakeCurrent(hDC, hRC);
+        surface.setPixelFormat(new PixelFormat(PixelFormat.ColorSpace.RGBA, 32, 24, 8));
+    }
 
+    @Override
+    public void show() {
         User32.showWindow(hWnd, SW_SHOW);
     }
 
@@ -112,7 +95,12 @@ public class Win32Window extends Window {
 
     @Override
     public void swapBuffers() {
-        GDI32.swapBuffers(hDC);
+        surface.swapBuffers();
+    }
+
+    @Override
+    public DrawingSurface getDrawingSurface() {
+        return surface;
     }
 
     private static long windowProc(MemorySegment hwnd, int uMsg, long wParam, long lParam) {
@@ -126,10 +114,17 @@ public class Win32Window extends Window {
     }
 
     @Override
-    public void close() {
+    public void dispose() {
         Opengl32.wglMakeCurrent(MemorySegment.NULL, MemorySegment.NULL);
-        Opengl32.wglDeleteContext(hRC);
-        User32.releaseDC(hWnd, hDC);
+        try {
+            surface.close();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         User32.destroyWindow(hWnd);
+    }
+
+    MemorySegment hWnd() {
+        return hWnd;
     }
 }

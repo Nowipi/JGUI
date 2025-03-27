@@ -1,14 +1,11 @@
-package nowipi.ffm.opengl;
+package nowipi.windowing;
 
 import nowipi.ffm.c.C;
-import nowipi.ffm.win32.wgl.GetProcAddress;
 import nowipi.ffm.win32.wgl.Opengl32;
+import nowipi.windowing.win32.WGLGraphicsContext;
 
-import java.lang.foreign.*;
-import java.lang.invoke.MethodHandle;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.lang.foreign.FunctionDescriptor;
+import java.lang.foreign.MemorySegment;
 
 import static nowipi.ffm.win32.user32.User32.arena;
 
@@ -1821,12 +1818,25 @@ public final class OpenGL {
     public static final int GL_ZOOM_X = 0xd16;
     public static final int GL_ZOOM_Y = 0xd17;
 
-    private OpenGL() {}
+    private static OpenGLImplementation implementation;
+    public static void init(OpenGLImplementation implementation) {
+        if (OpenGL.implementation != null)
+            throw new IllegalStateException("Can't intialize OpenGL multiple times");
+
+        OpenGL.implementation = implementation;
+    }
+
+    private static OpenGLImplementation getImplementation() {
+        if (implementation == null) {
+            throw new IllegalStateException("OpenGL implementation not initialized yet, did you create a context?");
+        }
+        return implementation;
+    }
 
     private static final FunctionDescriptor glClearDescriptor = FunctionDescriptor.ofVoid(C.INT);
     public static void glClear(int mask) {
         try {
-            getMethodHandle("glClear", glClearDescriptor).invokeExact(mask);
+            getImplementation().getMethodHandle("glClear", glClearDescriptor).invokeExact(mask);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -1835,7 +1845,7 @@ public final class OpenGL {
     private static final FunctionDescriptor glClearColorDescriptor = FunctionDescriptor.ofVoid(C.FLOAT, C.FLOAT, C.FLOAT, C.FLOAT);
     public static void glClearColor(float red, float green, float blue, float alpha) {
         try {
-            getMethodHandle("glClearColor", glClearColorDescriptor).invokeExact(red, green, blue, alpha);
+            getImplementation().getMethodHandle("glClearColor", glClearColorDescriptor).invokeExact(red, green, blue, alpha);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -1844,7 +1854,7 @@ public final class OpenGL {
     private static final FunctionDescriptor glCreateShaderDescriptor = FunctionDescriptor.of(C.INT, C.INT);
     public static int glCreateShader(int type) {
         try {
-            return (int) getMethodHandle("glCreateShader", glCreateShaderDescriptor).invokeExact(type);
+            return (int) getImplementation().getMethodHandle("glCreateShader", glCreateShaderDescriptor).invokeExact(type);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -1853,7 +1863,7 @@ public final class OpenGL {
     private static final FunctionDescriptor glShaderSourceDescriptor = FunctionDescriptor.ofVoid(C.INT, C.INT, C.POINTER, C.POINTER);
     public static void glShaderSource(int shader, int count, MemorySegment string, MemorySegment length) {
         try {
-            getMethodHandle("glShaderSource", glShaderSourceDescriptor).invokeExact(shader, count, string, length);
+            getImplementation().getMethodHandle("glShaderSource", glShaderSourceDescriptor).invokeExact(shader, count, string, length);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -1867,7 +1877,7 @@ public final class OpenGL {
     private static final FunctionDescriptor glCompileShaderDescriptor = FunctionDescriptor.ofVoid(C.INT);
     public static void glCompileShader(int shader) {
         try {
-            getMethodHandle("glCompileShader", glCompileShaderDescriptor).invokeExact(shader);
+            getImplementation().getMethodHandle("glCompileShader", glCompileShaderDescriptor).invokeExact(shader);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -1876,7 +1886,7 @@ public final class OpenGL {
     private static final FunctionDescriptor glCreateProgramDescriptor = FunctionDescriptor.of(C.INT);
     public static int glCreateProgram() {
         try {
-            return (int) getMethodHandle("glCreateProgram", glCreateProgramDescriptor).invokeExact();
+            return (int) getImplementation().getMethodHandle("glCreateProgram", glCreateProgramDescriptor).invokeExact();
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -1885,7 +1895,7 @@ public final class OpenGL {
     private static final FunctionDescriptor glAttachShaderDescriptor = FunctionDescriptor.ofVoid(C.INT, C.INT);
     public static void glAttachShader(int program, int shader) {
         try {
-            getMethodHandle("glAttachShader", glAttachShaderDescriptor).invokeExact(program, shader);
+            getImplementation().getMethodHandle("glAttachShader", glAttachShaderDescriptor).invokeExact(program, shader);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -1894,7 +1904,7 @@ public final class OpenGL {
     private static final FunctionDescriptor glLinkProgramDescriptor = FunctionDescriptor.ofVoid(C.INT);
     public static void glLinkProgram(int program) {
         try {
-            getMethodHandle("glLinkProgram", glLinkProgramDescriptor).invokeExact(program);
+            getImplementation().getMethodHandle("glLinkProgram", glLinkProgramDescriptor).invokeExact(program);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -1903,7 +1913,7 @@ public final class OpenGL {
     private static final FunctionDescriptor glDeleteShaderDescriptor = FunctionDescriptor.ofVoid(C.INT);
     public static void glDeleteShader(int shader) {
         try {
-            getMethodHandle("glDeleteShader", glDeleteShaderDescriptor).invokeExact(shader);
+            getImplementation().getMethodHandle("glDeleteShader", glDeleteShaderDescriptor).invokeExact(shader);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -1912,7 +1922,7 @@ public final class OpenGL {
     private static final FunctionDescriptor glGenVertexArraysDescriptor = FunctionDescriptor.ofVoid(C.INT, C.POINTER);
     public static void glGenVertexArrays(int n, MemorySegment arrays) {
         try {
-            getMethodHandle("glGenVertexArrays", glGenVertexArraysDescriptor).invokeExact(n, arrays);
+            getImplementation().getMethodHandle("glGenVertexArrays", glGenVertexArraysDescriptor).invokeExact(n, arrays);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -1927,7 +1937,7 @@ public final class OpenGL {
     private static final FunctionDescriptor glGenBuffersDescriptor = FunctionDescriptor.ofVoid(C.INT, C.POINTER);
     public static void glGenBuffers(int n, MemorySegment buffers) {
         try {
-            getMethodHandle("glGenBuffers", glGenBuffersDescriptor).invokeExact(n, buffers);
+            getImplementation().getMethodHandle("glGenBuffers", glGenBuffersDescriptor).invokeExact(n, buffers);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -1942,7 +1952,7 @@ public final class OpenGL {
     private static final FunctionDescriptor glBindVertexArrayDescriptor = FunctionDescriptor.ofVoid(C.INT);
     public static void glBindVertexArray(int array) {
         try {
-            getMethodHandle("glBindVertexArray", glBindVertexArrayDescriptor).invokeExact(array);
+            getImplementation().getMethodHandle("glBindVertexArray", glBindVertexArrayDescriptor).invokeExact(array);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -1951,7 +1961,7 @@ public final class OpenGL {
     private static final FunctionDescriptor glVertexAttribPointerDescriptor = FunctionDescriptor.ofVoid(C.INT, C.INT, C.INT, C.INT, C.INT, C.POINTER);
     public static void glVertexAttribPointer(int index, int size, int type, int normalized, int stride, MemorySegment pointer) {
         try {
-            getMethodHandle("glVertexAttribPointer", glVertexAttribPointerDescriptor).invokeExact(index, size, type, normalized, stride, pointer);
+            getImplementation().getMethodHandle("glVertexAttribPointer", glVertexAttribPointerDescriptor).invokeExact(index, size, type, normalized, stride, pointer);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -1960,7 +1970,7 @@ public final class OpenGL {
     private static final FunctionDescriptor glEnableVertexAttribArrayDescriptor = FunctionDescriptor.ofVoid(C.INT);
     public static void glEnableVertexAttribArray(int index) {
         try {
-            getMethodHandle("glEnableVertexAttribArray", glEnableVertexAttribArrayDescriptor).invokeExact(index);
+            getImplementation().getMethodHandle("glEnableVertexAttribArray", glEnableVertexAttribArrayDescriptor).invokeExact(index);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -1969,7 +1979,7 @@ public final class OpenGL {
     private static final FunctionDescriptor glBindBufferDescriptor = FunctionDescriptor.ofVoid(C.INT, C.INT);
     public static void glBindBuffer(int target, int buffer) {
         try {
-            getMethodHandle("glBindBuffer", glBindBufferDescriptor).invokeExact(target, buffer);
+            getImplementation().getMethodHandle("glBindBuffer", glBindBufferDescriptor).invokeExact(target, buffer);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -1978,7 +1988,7 @@ public final class OpenGL {
     private static final FunctionDescriptor glBufferDataDescriptor = FunctionDescriptor.ofVoid(C.INT, C.INT, C.POINTER, C.INT);
     public static void glBufferData(int target, int size, MemorySegment data, int usage) {
         try {
-            getMethodHandle("glBufferData", glBufferDataDescriptor).invokeExact(target, size, data, usage);
+            getImplementation().getMethodHandle("glBufferData", glBufferDataDescriptor).invokeExact(target, size, data, usage);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -1995,7 +2005,7 @@ public final class OpenGL {
     private static final FunctionDescriptor glUseProgramDescriptor = FunctionDescriptor.ofVoid(C.INT);
     public static void glUseProgram(int program) {
         try {
-            getMethodHandle("glUseProgram", glUseProgramDescriptor).invokeExact(program);
+            getImplementation().getMethodHandle("glUseProgram", glUseProgramDescriptor).invokeExact(program);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -2004,7 +2014,7 @@ public final class OpenGL {
     private static final FunctionDescriptor glDrawElementsDescriptor = FunctionDescriptor.ofVoid(C.INT, C.INT, C.INT, C.POINTER);
     public static void glDrawElements(int mode, int count, int type, MemorySegment indices) {
         try {
-            getMethodHandle("glDrawElements", glDrawElementsDescriptor).invokeExact(mode, count, type, indices);
+            getImplementation().getMethodHandle("glDrawElements", glDrawElementsDescriptor).invokeExact(mode, count, type, indices);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -2013,7 +2023,7 @@ public final class OpenGL {
     private static final FunctionDescriptor glDeleteVertexArraysDescriptor = FunctionDescriptor.ofVoid(C.INT, C.POINTER);
     public static void glDeleteVertexArrays(int n, MemorySegment arrays) {
         try {
-            getMethodHandle("glDeleteVertexArrays", glDeleteVertexArraysDescriptor).invokeExact(n, arrays);
+            getImplementation().getMethodHandle("glDeleteVertexArrays", glDeleteVertexArraysDescriptor).invokeExact(n, arrays);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -2026,7 +2036,7 @@ public final class OpenGL {
     private static final FunctionDescriptor glDeleteBuffersDescriptor = FunctionDescriptor.ofVoid(C.INT, C.POINTER);
     public static void glDeleteBuffers(int n, MemorySegment buffers) {
         try {
-            getMethodHandle("glDeleteBuffers", glDeleteBuffersDescriptor).invokeExact(n, buffers);
+            getImplementation().getMethodHandle("glDeleteBuffers", glDeleteBuffersDescriptor).invokeExact(n, buffers);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -2039,7 +2049,7 @@ public final class OpenGL {
     private static final FunctionDescriptor glDeleteProgramDescriptor = FunctionDescriptor.ofVoid(C.INT);
     public static void glDeleteProgram(int program) {
         try {
-            getMethodHandle("glDeleteProgram", glDeleteProgramDescriptor).invokeExact(program);
+            getImplementation().getMethodHandle("glDeleteProgram", glDeleteProgramDescriptor).invokeExact(program);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -2048,7 +2058,7 @@ public final class OpenGL {
     private static final FunctionDescriptor glGetShaderivDescriptor = FunctionDescriptor.ofVoid(C.INT, C.INT, C.POINTER);
     public static void glGetShaderiv(int shader, int pname, MemorySegment params) {
         try {
-            getMethodHandle("glGetShaderiv", glGetShaderivDescriptor).invokeExact(shader, pname, params);
+            getImplementation().getMethodHandle("glGetShaderiv", glGetShaderivDescriptor).invokeExact(shader, pname, params);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -2063,7 +2073,7 @@ public final class OpenGL {
     private static final FunctionDescriptor glGetShaderInfoLogDescriptor = FunctionDescriptor.ofVoid(C.INT, C.INT, C.POINTER, C.POINTER);
     public static void glGetShaderInfoLog(int shader, int maxLength, MemorySegment length, MemorySegment infoLog) {
         try {
-            getMethodHandle("glGetShaderInfoLog", glGetShaderInfoLogDescriptor).invokeExact(shader, maxLength, length, infoLog);
+            getImplementation().getMethodHandle("glGetShaderInfoLog", glGetShaderInfoLogDescriptor).invokeExact(shader, maxLength, length, infoLog);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -2078,7 +2088,7 @@ public final class OpenGL {
     private static final FunctionDescriptor glGetProgramivDescriptor = FunctionDescriptor.ofVoid(C.INT, C.INT, C.POINTER);
     public static void glGetProgramiv(int program, int pname, MemorySegment params) {
         try {
-            getMethodHandle("glGetProgramiv", glGetProgramivDescriptor).invokeExact(program, pname, params);
+            getImplementation().getMethodHandle("glGetProgramiv", glGetProgramivDescriptor).invokeExact(program, pname, params);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -2093,7 +2103,7 @@ public final class OpenGL {
     private static final FunctionDescriptor glGetProgramInfoLogDescriptor = FunctionDescriptor.ofVoid(C.INT, C.INT, C.POINTER, C.POINTER);
     public static void glGetProgramInfoLog(int program, int maxLength, MemorySegment length, MemorySegment infoLog) {
         try {
-            getMethodHandle("glGetProgramInfoLog", glGetProgramInfoLogDescriptor).invokeExact(program, maxLength, length, infoLog);
+            getImplementation().getMethodHandle("glGetProgramInfoLog", glGetProgramInfoLogDescriptor).invokeExact(program, maxLength, length, infoLog);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -2104,37 +2114,4 @@ public final class OpenGL {
         glGetProgramInfoLog(program, maxLength, arena.allocateFrom(C.INT, 0), infoLog);
         return infoLog.getString(0);
     }
-
-    //From: https://github.com/FDoKE/opengl-ffm/blob/master/src/main/java/ru/fdoke/ffm/opengl/api/opengl/OpenglApi.java
-    private static final Map<String, MethodHandle> methodHandles = new HashMap<>();
-    private static MethodHandle getMethodHandle(String methodName, FunctionDescriptor descriptor) {
-        MethodHandle cachedHandle = methodHandles.get(methodName);
-        if (cachedHandle != null) {
-            return cachedHandle;
-        }
-
-        // trying to find method handle by loaderLookup
-        Optional<MemorySegment> directMethodAddress = Opengl32.lookup.find(methodName);
-        if (directMethodAddress.isPresent()) {
-            MethodHandle methodHandle = Linker.nativeLinker().downcallHandle(directMethodAddress.get(), descriptor);
-            methodHandles.put(methodName, methodHandle);
-            return methodHandle;
-        }
-
-        // Some opengl functions are not in lookup table (extensions) so we need to call wglGetProcAddress to get pointer to needed function
-        MemorySegment extensionMethodNameMemorySegment = arena.allocateFrom(methodName);
-        MemorySegment address = Opengl32.wglGetProcAddress(extensionMethodNameMemorySegment);
-
-        if (address.equals(MemorySegment.NULL)) {
-            throw new IllegalArgumentException("Could not find method: " + methodName);
-        }
-
-
-        // making call to retrieved function address
-        MemorySegment methodAddress = MemorySegment.ofAddress(address.address());
-        MethodHandle methodHandle = Linker.nativeLinker().downcallHandle(methodAddress, descriptor);
-        methodHandles.put(methodName, methodHandle);
-        return methodHandle;
-    }
-
 }

@@ -1,12 +1,21 @@
-import nowipi.windowing.Window;
-import nowipi.windowing.Win32Window;
+import nowipi.windowing.*;
+import nowipi.windowing.win32.WGLGraphicsContext;
+import nowipi.windowing.win32.Win32DrawingSurface;
+import nowipi.windowing.win32.Win32Window;
 
-import static nowipi.ffm.opengl.OpenGL.*;
+import static nowipi.windowing.OpenGL.*;
 
 class TestApp {
 
     public static void main(String[] args) {
         Window window = new Win32Window("Hello, Window!", 1080, 650);
+
+        DrawingSurface surface = window.getDrawingSurface();
+        GraphicsContext<Win32DrawingSurface> gc = new WGLGraphicsContext((Win32DrawingSurface) surface);
+        gc.makeCurrent();
+
+        window.show();
+        //RenderContext render
 
         while (!window.shouldClose()) {
 
@@ -17,7 +26,8 @@ class TestApp {
 
             window.pollEvents();
         }
-        window.close();
+        gc.dispose();
+        window.dispose();
     }
 
 }

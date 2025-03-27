@@ -1,13 +1,10 @@
 package nowipi.windowing;
 
-public abstract class Window implements AutoCloseable {
+public interface Window extends Disposable {
 
-    public Window(String title, int width, int height) {}
-
-    public abstract boolean shouldClose();
-    public abstract void pollEvents();
-    public abstract void swapBuffers();
-
-    @Override
-    public void close() {}
+    void show();
+    boolean shouldClose();
+    void pollEvents();
+    void swapBuffers();
+    DrawingSurface getDrawingSurface();
 }
