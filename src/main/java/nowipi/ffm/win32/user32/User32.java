@@ -25,6 +25,8 @@ public final class User32 {
     public static final int WM_ENTERSIZEMOVE = 0x0231;
     public static final int WM_EXITSIZEMOVE  = 0x0232;
 
+    public static final int CS_HREDRAW = 0x001;
+    public static final int CS_VREDRAW = 0x002;
     public static final int CS_OWNDC = 0x0020;
 
 

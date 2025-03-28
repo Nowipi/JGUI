@@ -39,6 +39,7 @@ public final class WGLGraphicsContext extends GraphicsContext<GDIDrawingSurface>
 
     @Override
     public void dispose() {
+        Opengl32.wglMakeCurrent(MemorySegment.NULL, MemorySegment.NULL);
         Opengl32.wglDeleteContext(hRC);
     }
 }

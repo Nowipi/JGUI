@@ -60,7 +60,7 @@ public final class Win32Window extends MapEventDispatcher implements Window {
     public void pollEvents() {
         try(Arena arena = Arena.ofConfined()) {
             MemorySegment msg = MSG.allocate(arena);
-            while (User32.peekMessageW(msg, MemorySegment.NULL, 0, 0, PM_REMOVE) > 0) {
+            while (User32.peekMessageW(msg, hWnd, 0, 0, PM_REMOVE) > 0) {
                 User32.translateMessage(msg);
                 User32.dispatchMessageW(msg);
             }
@@ -79,7 +79,6 @@ public final class Win32Window extends MapEventDispatcher implements Window {
 
     @Override
     public void dispose() {
-        Opengl32.wglMakeCurrent(MemorySegment.NULL, MemorySegment.NULL);
         surface.dispose();
         User32.destroyWindow(hWnd);
     }
@@ -107,7 +106,7 @@ public final class Win32Window extends MapEventDispatcher implements Window {
         }
 
         WNDCLASSW.sethCursor(wc, User32.loadCursorA(MemorySegment.NULL, User32.IDC_ARROW));
-        WNDCLASSW.setStyle(wc, CS_OWNDC);
+        WNDCLASSW.setStyle(wc, CS_HREDRAW | CS_VREDRAW | CS_OWNDC);
 
 
         User32.registerClassW(wc);
