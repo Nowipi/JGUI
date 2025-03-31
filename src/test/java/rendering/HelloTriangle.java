@@ -1,3 +1,5 @@
+package rendering;
+
 import nowipi.rendering.GraphicsContext;
 import nowipi.rendering.OpenGL;
 import nowipi.rendering.WGLGraphicsContext;

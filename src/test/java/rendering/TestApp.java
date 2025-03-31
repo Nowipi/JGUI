@@ -1,4 +1,5 @@
-import nowipi.event.EventListener;
+package rendering;
+
 import nowipi.rendering.GraphicsContext;
 import nowipi.windowing.*;
 import nowipi.rendering.WGLGraphicsContext;
