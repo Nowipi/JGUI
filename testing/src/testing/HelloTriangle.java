@@ -1,45 +1,15 @@
-# JGUI
-A single-threaded Java GUI library using Java [FFM](https://docs.oracle.com/en/java/javase/23/core/foreign-function-and-memory-api.html) as a backend to access native OS GUI libraries.
-## Goals
-- Cross-platform
-- Lightweight components
-- Immediate mode GUI
-- Minimal dependencies
-- No magic
-## Implementations
-Currently, only Windows is supported via the [Win32 library](https://nl.wikipedia.org/wiki/Windows_API).
-## Examples
-### Basic Window Example
-```Java
-class TestApp {
+package testing;
 
-    public static void main(String[] args) {
-        Window window = new Win32Window("Hello, Window!", 1080, 650);
+import nowipi.jgui.opengl.GraphicsContext;
+import nowipi.jgui.opengl.OpenGL;
+import nowipi.jgui.window.Window;
+import nowipi.jgui.window.event.WindowResizeEvent;
 
-        DrawingSurface surface = window.getDrawingSurface();
-        GraphicsContext<Win32DrawingSurface> gc = new WGLGraphicsContext((Win32DrawingSurface) surface);
-        gc.makeCurrent();
+import java.lang.foreign.MemorySegment;
 
-        window.show();
+import static nowipi.jgui.opengl.OpenGL.*;
 
-        while (!window.shouldClose()) {
-
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            glClearColor(1, 1, 0, 1);
-
-            window.swapBuffers();
-
-            window.pollEvents();
-        }
-        gc.dispose();
-        window.dispose();
-    }
-
-}
-````
-### Hello Traingle Example
-```Java
-class testing.HelloTriangle {
+class HelloTriangle {
 
     private static final int SCR_WIDTH = 800;
     private static final int SCR_HEIGHT = 600;
@@ -49,10 +19,13 @@ class testing.HelloTriangle {
 
     public static void main(String[] args) {
 
-        Window window = new Win32Window("Hello, Window!", SCR_WIDTH, SCR_HEIGHT);
+        Window window = Window.create("Hello, Window!", SCR_WIDTH, SCR_HEIGHT);
 
-        GraphicsContext<Win32DrawingSurface> gc = new WGLGraphicsContext((Win32DrawingSurface) window.getDrawingSurface());
-        gc.makeCurrent();
+        window.addListener(WindowResizeEvent.class, e -> glViewport(0, 0, e.width(), e.height()));
+
+        GraphicsContext context = window.createGraphicsContext();
+        context.makeCurrent();
+        OpenGL.init(context);
 
         int vertexShader = glCreateShader(GL_VERTEX_SHADER);
         glShaderSource(vertexShader, vertexShaderSource);
@@ -102,8 +75,8 @@ class testing.HelloTriangle {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices, GL_STATIC_DRAW);
 
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * Float.BYTES, MemorySegment.NULL);
-        OpenGL.glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, false, 3 * Float.BYTES, MemorySegment.NULL);
+        glEnableVertexAttribArray(0);
 
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -122,6 +95,7 @@ class testing.HelloTriangle {
             glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, MemorySegment.NULL);
 
             window.swapBuffers();
+
             window.pollEvents();
         }
 
@@ -129,10 +103,8 @@ class testing.HelloTriangle {
         glDeleteBuffers(VBO);
         glDeleteBuffers(EBO);
         glDeleteProgram(shaderProgram);
-        gc.dispose();
+        context.dispose();
         window.dispose();
     }
 
 }
-````
-As you can see, the architecture is based on [GLFW](https://www.glfw.org/).
