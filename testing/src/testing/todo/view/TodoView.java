@@ -20,7 +20,6 @@ public final class TodoView extends Container {
                     public void interact() {
                         viewModel.addItem(textInput.text());
                         textInput.clear();
-
                     }
                 }
         );
@@ -28,10 +27,6 @@ public final class TodoView extends Container {
 
     private static Component CheckListView(TodoViewModel viewModel) {
         return new Container(viewModel.getItems());
-    }
-
-    public void render() {
-
     }
 
 }

@@ -22,6 +22,7 @@ public final class CheckList {
 
     public void add(Item item) {
         items.add(item);
+        System.out.println("added: " + item);
     }
 
     public List<Item> items() {

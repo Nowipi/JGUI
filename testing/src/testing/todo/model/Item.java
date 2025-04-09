@@ -16,6 +16,7 @@ public final class Item {
 
     public void setDone(boolean done) {
         this.done = done;
+        System.out.println(name + " set Done to " + done);
     }
 
     public String name() {
