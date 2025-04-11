@@ -1,7 +1,6 @@
 package testing.todo;
 
 import com.sun.net.httpserver.HttpServer;
-import nowipi.jgui.components.*;
 import testing.todo.model.CheckList;
 import testing.todo.model.Item;
 import testing.todo.view.TodoView;
