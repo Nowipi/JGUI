@@ -1,6 +1,6 @@
 package nowipi.jgui.components;
 
-public class Text implements Component {
+public class Text extends Component {
 
     private String text;
 

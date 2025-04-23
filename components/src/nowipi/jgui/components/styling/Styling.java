@@ -4,33 +4,21 @@ public final class Styling {
 
     public Padding padding;
     public Size size;
-    public Layout layout;
     public Border border;
-    public Object backgroundColor;
+    public Color backgroundColor;
 
-    public Styling(Padding padding, Size size, Layout layout, Border border, Object backgroundColor) {
+    public Styling(Padding padding, Size size, Border border, Color backgroundColor) {
         this.backgroundColor = backgroundColor;
         this.border = border;
-        this.layout = layout;
         this.padding = padding;
         this.size = size;
     }
 
-    public Styling() {
-        padding = Padding.newUniform(0);
-        size = new Size(new Fit(), new Fit());
-        layout = new Layout();
-        border = Border.newUniform(0);
-        backgroundColor = "white";
-    }
-
     public static final class Builder {
-
-        private Styling styling = new Styling();
-        private Padding padding = styling.padding;
-        private Size size = styling.size;
-        private Layout layout = styling.layout;
-        private Border border = styling.border;
+        private Padding padding = Padding.newUniform(0);
+        private Size size = new Size(new Fit(), new Fit());
+        private Border border = Border.newUniform(0);
+        private Color backgroundColor = Color.BLACK;
 
         public Builder padding(Padding padding) {
             this.padding = padding;
@@ -60,26 +48,19 @@ public final class Styling {
             return this;
         }
 
-        public Builder layout(Layout layout) {
-            this.layout = layout;
-            return this;
-        }
-
         public Builder border(Border border) {
             this.border = border;
             return this;
         }
 
-        public Styling build() {
-            return new Styling(padding, size, layout, border, "white");
+        public Builder backgroundColor(Color backgroundColor) {
+            this.backgroundColor = backgroundColor;
+            return this;
         }
-    }
 
-    static final class Layout {
-        private Object direction;
-        private float gap;
-        private Alignment alignement;
-
+        public Styling build() {
+            return new Styling(padding, size, border, backgroundColor);
+        }
     }
 
 }

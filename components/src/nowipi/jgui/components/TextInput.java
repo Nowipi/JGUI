@@ -1,6 +1,6 @@
 package nowipi.jgui.components;
 
-public class TextInput implements Component {
+public class TextInput extends Component {
 
     private final StringBuffer text = new StringBuffer();
 

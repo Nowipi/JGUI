@@ -2163,4 +2163,120 @@ public final class OpenGL {
             throw new RuntimeException(e);
         }
     }
+
+    private static final FunctionDescriptor glGenTexturesDescriptor = FunctionDescriptor.ofVoid(GLsizei, POINTER);
+    public static void glGenTextures(int n, MemorySegment textures) {
+        try {
+            getContext().getMethodHandle("glGenTextures", glGenTexturesDescriptor).invokeExact(n, textures);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static int glGenTextures() {
+        try(var arena = Arena.ofConfined()) {
+            MemorySegment buffer = arena.allocateFrom(POINTER, arena.allocateFrom(GLuint));
+            glGenTextures(1, buffer);
+            return buffer.get(GLuint, 0);
+        }
+    }
+
+    private static final FunctionDescriptor glTexImage2DDescriptor = FunctionDescriptor.ofVoid(GLenum, GLint, GLint, GLsizei, GLsizei, GLint, GLenum, GLenum, POINTER);
+    public static void glTexImage2D(int target, int level, int internalformat, int width, int height, int border, int format, int type, MemorySegment data) {
+        try {
+            getContext().getMethodHandle("glTexImage2D", glTexImage2DDescriptor).invokeExact(target, level, internalformat, width, height, border, format, type, data);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void glTexImage2D(int target, int level, int internalformat, int width, int height, int border, int format, int type, byte[] data) {
+        try(var arena = Arena.ofConfined()) {
+            glTexImage2D(target, level, internalformat, width, height, border, format, type, arena.allocateFrom(GLbyte, data));
+        }
+    }
+
+    private static final FunctionDescriptor glTexParameteriDescriptor = FunctionDescriptor.ofVoid(GLenum, GLenum, GLint);
+    public static void glTexParameteri(int target, int pname, int param) {
+        try {
+            getContext().getMethodHandle("glTexParameteri", glTexParameteriDescriptor).invokeExact(target, pname, param);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final FunctionDescriptor glBindTextureDescriptor = FunctionDescriptor.ofVoid(GLenum, GLuint);
+    public static void glBindTexture(int target, int texture) {
+        try {
+            getContext().getMethodHandle("glBindTexture", glBindTextureDescriptor).invokeExact(target, texture);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final FunctionDescriptor glGetUniformLocationDescriptor = FunctionDescriptor.of(GLint, GLuint, POINTER);
+    public static int glGetUniformLocation(int program, MemorySegment name) {
+        try {
+            return (int) getContext().getMethodHandle("glGetUniformLocation", glGetUniformLocationDescriptor).invokeExact(program, name);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static int glGetUniformLocation(int program, String name) {
+        try(var arena = Arena.ofConfined()) {
+            return glGetUniformLocation(program, arena.allocateFrom(name));
+        }
+    }
+
+    private static final FunctionDescriptor glUniformMatrix4fvDescriptor = FunctionDescriptor.ofVoid(GLint, GLsizei, GLboolean, POINTER);
+    public static void glUniformMatrix4fv(int location, int count, boolean transpose, MemorySegment value) {
+        try {
+            getContext().getMethodHandle("glUniformMatrix4fv", glUniformMatrix4fvDescriptor).invokeExact(location, count, transpose, value);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void glUniformMatrix4fv(int location, int count, boolean transpose, float[] value) {
+        try(var arena = Arena.ofConfined()) {
+            glUniformMatrix4fv(location, count, transpose, arena.allocateFrom(GLfloat, value));
+        }
+    }
+
+    private static final FunctionDescriptor glUniform4fDescriptor = FunctionDescriptor.ofVoid(GLint, GLfloat, GLfloat, GLfloat, GLfloat);
+    public static void glUniform4f(int location, float v0, float v1, float v2, float v3) {
+        try {
+            getContext().getMethodHandle("glUniform4f", glUniform4fDescriptor).invokeExact(location, v0, v1, v2, v3);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final FunctionDescriptor glActiveTextureDescriptor = FunctionDescriptor.ofVoid(GLenum);
+    public static void glActiveTexture(int texture) {
+        try {
+            getContext().getMethodHandle("glActiveTexture", glActiveTextureDescriptor).invokeExact(texture);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final FunctionDescriptor glDrawArraysDescriptor = FunctionDescriptor.ofVoid(GLenum, GLint, GLsizei);
+    public static void glDrawArrays(int mode, int first, int count) {
+        try {
+            getContext().getMethodHandle("glDrawArrays", glDrawArraysDescriptor).invokeExact(mode, first, count);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final FunctionDescriptor glUniform1iDescriptor = FunctionDescriptor.ofVoid(GLint, GLint);
+    public static void glUniform1i(int location, int v0) {
+        try {
+            getContext().getMethodHandle("glUniform1i", glUniform1iDescriptor).invokeExact(location, v0);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

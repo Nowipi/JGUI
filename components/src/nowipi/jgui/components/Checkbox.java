@@ -1,6 +1,6 @@
 package nowipi.jgui.components;
 
-public abstract class Checkbox implements Interactable, Component {
+public abstract class Checkbox extends Component implements Interactable {
 
     private boolean checked;
 

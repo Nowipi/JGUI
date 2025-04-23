@@ -5,4 +5,6 @@ module testing {
     requires java.net.http;
     requires jdk.httpserver;
     requires jdk.xml.dom;
+    requires primitives;
+    requires java.desktop;
 }

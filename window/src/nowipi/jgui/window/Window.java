@@ -14,6 +14,8 @@ public interface Window extends Disposable, EventDispatcher {
     void swapBuffers();
     GraphicsContext createGraphicsContext();
     void setPixelFormat(PixelFormat format);
+    int width();
+    int height();
 
     static Window create(String title, int width, int height) {
         for (WindowProvider provider : ServiceLoader.load(WindowProvider.class)) {

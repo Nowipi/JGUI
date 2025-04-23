@@ -26,8 +26,12 @@ public final class Win32Window extends MapEventDispatcher implements Window {
 
     private final MemorySegment hWnd;
     private final MemorySegment hDC;
+    private int width;
+    private int height;
 
     public Win32Window(String title, int width, int height) {
+        this.width = width;
+        this.height = height;
         this.hWnd = User32.createWindowExW(
                 0,
                 CLASS_NAME,
@@ -94,6 +98,16 @@ public final class Win32Window extends MapEventDispatcher implements Window {
     }
 
     @Override
+    public int width() {
+        return width;
+    }
+
+    @Override
+    public int height() {
+        return height;
+    }
+
+    @Override
     public void dispose() {
         User32.releaseDC(hWnd, hDC);
         User32.destroyWindow(hWnd);
@@ -136,6 +150,8 @@ public final class Win32Window extends MapEventDispatcher implements Window {
                 var window = windows.get(hwnd);
                 int width = Win32.loWord(lParam);
                 int height = Win32.hiWord(lParam);
+                window.width = width;
+                window.height = height;
                 window.dispatch(WindowResizeEvent.class, new WindowResizeEvent(width, height));
                 return 0;
             }

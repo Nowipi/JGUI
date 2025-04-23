@@ -4,7 +4,7 @@ import nowipi.jgui.components.Component;
 
 public final class Fixed implements SizingMode {
 
-    private final float size;
+    private float size;
 
     public Fixed(float size) {
         this.size = size;
@@ -13,5 +13,9 @@ public final class Fixed implements SizingMode {
     @Override
     public float size(Component component) {
         return size;
+    }
+
+    public void setSize(float size) {
+        this.size = size;
     }
 }
