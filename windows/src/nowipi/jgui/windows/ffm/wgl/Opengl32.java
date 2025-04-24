@@ -23,33 +23,41 @@ public final class Opengl32 {
     private Opengl32() {
     }
 
+    private static final FunctionDescriptor wglCreateContextDescriptor = FunctionDescriptor.of(C.POINTER, C.POINTER);
     public static MemorySegment wglCreateContext(MemorySegment hDC) {
         try {
-            return (MemorySegment) CreateContext.handle.invokeExact(hDC);
+            return (MemorySegment) getMethodHandle("wglCreateContext", wglCreateContextDescriptor).invokeExact(hDC);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
     }
 
+    private static final FunctionDescriptor wglMakeCurrentDescriptor = FunctionDescriptor.of(C.INT, C.POINTER, C.POINTER);
     public static int wglMakeCurrent(MemorySegment hDC, MemorySegment hRC) {
         try {
-            return (int) MakeCurrent.handle.invokeExact(hDC, hRC);
+            return (int) getMethodHandle("wglMakeCurrent", wglMakeCurrentDescriptor).invokeExact(hDC, hRC);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
     }
 
+    private static final FunctionDescriptor wglGetProcAddressDescriptor = FunctionDescriptor.of(C.POINTER,
+            C.POINTER
+    );
     public static MemorySegment wglGetProcAddress(MemorySegment unnamedParam1) {
         try {
-            return (MemorySegment) GetProcAddress.handle.invokeExact(unnamedParam1);
+            return (MemorySegment) getMethodHandle("wglGetProcAddress", wglGetProcAddressDescriptor).invokeExact(unnamedParam1);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
     }
 
+    private static final FunctionDescriptor wglDeleteContextDescriptor = FunctionDescriptor.of(C.INT,
+            C.POINTER
+    );
     public static int wglDeleteContext(MemorySegment unnamedParam1) {
         try {
-            return (int) DeleteContext.handle.invokeExact(unnamedParam1);
+            return (int) getMethodHandle("wglDeleteContext", wglDeleteContextDescriptor).invokeExact(unnamedParam1);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }

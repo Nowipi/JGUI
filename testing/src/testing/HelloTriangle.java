@@ -1,13 +1,13 @@
 package testing;
 
-import nowipi.jgui.opengl.GraphicsContext;
-import nowipi.jgui.opengl.OpenGL;
+import nowipi.opengl.GraphicsContext;
+import nowipi.opengl.OpenGL;
 import nowipi.jgui.window.Window;
 import nowipi.jgui.window.event.WindowResizeEvent;
 
 import java.lang.foreign.MemorySegment;
 
-import static nowipi.jgui.opengl.OpenGL.*;
+import static nowipi.opengl.OpenGL.*;
 
 class HelloTriangle {
 

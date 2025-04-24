@@ -1,13 +1,12 @@
 package nowipi.jgui.windows.wgl;
 
-import nowipi.jgui.opengl.GraphicsContext;
+import nowipi.opengl.GraphicsContext;
 import nowipi.jgui.windows.ffm.wgl.Opengl32;
 
 import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.MemorySegment;
 import java.lang.invoke.MethodHandle;
 
-//From: https://github.com/FDoKE/opengl-ffm/blob/master/src/main/java/ru/fdoke/ffm/opengl/api/opengl/OpenglApi.java
 public final class WGLGraphicsContext implements GraphicsContext {
 
 

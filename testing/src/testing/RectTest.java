@@ -1,13 +1,16 @@
 package testing;
 
-import nowipi.jgui.opengl.GraphicsContext;
-import nowipi.jgui.opengl.OpenGL;
+import nowipi.opengl.GraphicsContext;
+import nowipi.opengl.OpenGL;
+import nowipi.jgui.rendering.OpenGLTexture;
+import nowipi.jgui.rendering.TextureRenderer;
 import nowipi.jgui.window.Window;
 import nowipi.jgui.window.event.WindowResizeEvent;
+import nowipi.primitives.Matrix4f;
 
 import java.io.IOException;
 
-import static nowipi.jgui.opengl.OpenGL.*;
+import static nowipi.opengl.OpenGL.*;
 
 final class RectTest {
 

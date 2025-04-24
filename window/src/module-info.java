@@ -1,6 +1,6 @@
 module jgui.window {
 
-    requires jgui.opengl;
+    requires opengl;
 
     uses nowipi.jgui.window.WindowProvider;
     exports nowipi.jgui.window;

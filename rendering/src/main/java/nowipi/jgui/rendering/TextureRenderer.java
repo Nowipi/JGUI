@@ -1,20 +1,20 @@
-package testing;
-
-import nowipi.jgui.window.Disposable;
+package nowipi.jgui.rendering;
 
 import java.lang.foreign.MemorySegment;
 import java.util.HashMap;
 import java.util.Map;
 
-import static nowipi.jgui.opengl.OpenGL.*;
+import nowipi.opengl.OpenGL;
+import nowipi.primitives.Axis;
+import nowipi.primitives.Matrix4f;
 
-final class TextureRenderer implements Renderer, Disposable {
+public final class TextureRenderer implements Renderer {
 
     private static final int shader;
 
     static {
-        int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-        glShaderSource(vertexShader, "#version 330 core\n" +
+        int vertexShader = OpenGL.glCreateShader(OpenGL.GL_VERTEX_SHADER);
+        OpenGL.glShaderSource(vertexShader, "#version 330 core\n" +
                 "layout (location = 0) in vec4 vertex; // <vec2 position, vec2 texCoords>\n" +
                 "\n" +
                 "out vec2 TexCoords;\n" +
@@ -27,10 +27,10 @@ final class TextureRenderer implements Renderer, Disposable {
                 "    TexCoords = vertex.zw;\n" +
                 "    gl_Position = projection * model * vec4(vertex.xy, 0.0, 1.0);\n" +
                 "}");
-        glCompileShader(vertexShader);
+        OpenGL.glCompileShader(vertexShader);
 
-        int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-        glShaderSource(fragmentShader, "#version 330 core\n" +
+        int fragmentShader = OpenGL.glCreateShader(OpenGL.GL_FRAGMENT_SHADER);
+        OpenGL.glShaderSource(fragmentShader, "#version 330 core\n" +
                 "in vec2 TexCoords;\n" +
                 "out vec4 color;\n" +
                 "\n" +
@@ -41,15 +41,15 @@ final class TextureRenderer implements Renderer, Disposable {
                 "{    \n" +
                 "    color = spriteColor * texture(image, TexCoords);\n" +
                 "}");
-        glCompileShader(fragmentShader);
+        OpenGL.glCompileShader(fragmentShader);
 
-        shader = glCreateProgram();
-        glAttachShader(shader, vertexShader);
-        glAttachShader(shader, fragmentShader);
+        shader = OpenGL.glCreateProgram();
+        OpenGL.glAttachShader(shader, vertexShader);
+        OpenGL.glAttachShader(shader, fragmentShader);
 
-        glLinkProgram(shader);
-        glDeleteShader(vertexShader);
-        glDeleteShader(fragmentShader);
+        OpenGL.glLinkProgram(shader);
+        OpenGL.glDeleteShader(vertexShader);
+        OpenGL.glDeleteShader(fragmentShader);
     }
 
     private final int quadVAO;
@@ -70,31 +70,31 @@ final class TextureRenderer implements Renderer, Disposable {
                 0, 3, 1
         };
 
-        quadVAO = glGenVertexArrays();
-        VBO = glGenBuffers();
-        EBO = glGenBuffers();
+        quadVAO = OpenGL.glGenVertexArrays();
+        VBO = OpenGL.glGenBuffers();
+        EBO = OpenGL.glGenBuffers();
 
-        glBindVertexArray(quadVAO);
+        OpenGL.glBindVertexArray(quadVAO);
 
-        glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glBufferData(GL_ARRAY_BUFFER, vertices, GL_STATIC_DRAW);
+        OpenGL.glBindBuffer(OpenGL.GL_ARRAY_BUFFER, VBO);
+        OpenGL.glBufferData(OpenGL.GL_ARRAY_BUFFER, vertices, OpenGL.GL_STATIC_DRAW);
 
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices, GL_STATIC_DRAW);
+        OpenGL.glBindBuffer(OpenGL.GL_ELEMENT_ARRAY_BUFFER, EBO);
+        OpenGL.glBufferData(OpenGL.GL_ELEMENT_ARRAY_BUFFER, indices, OpenGL.GL_STATIC_DRAW);
 
-        glVertexAttribPointer(0, 4, GL_FLOAT, false, 4 * Float.BYTES, MemorySegment.NULL);
-        glEnableVertexAttribArray(0);
+        OpenGL.glVertexAttribPointer(0, 4, OpenGL.GL_FLOAT, false, 4 * Float.BYTES, MemorySegment.NULL);
+        OpenGL.glEnableVertexAttribArray(0);
 
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glBindVertexArray(0);
+        OpenGL.glBindBuffer(OpenGL.GL_ARRAY_BUFFER, 0);
+        OpenGL.glBindVertexArray(0);
 
 
-        glUseProgram(shader);
-        glUniform1i(getUniform(shader, "image"), 0);
+        OpenGL.glUseProgram(shader);
+        OpenGL.glUniform1i(getUniform(shader, "image"), 0);
     }
 
     public void drawTexture(OpenGLTexture texture, int x, int y, int width, int height, float rotation, float r, float g, float b, float a) {
-        glUseProgram(shader);
+        OpenGL.glUseProgram(shader);
         var model = Matrix4f.identity();
         model = Matrix4f.translate(model, x, y, 0);
 
@@ -104,12 +104,12 @@ final class TextureRenderer implements Renderer, Disposable {
 
         model = Matrix4f.scale(model, width, height, 1); // last scale
 
-        glUniformMatrix4fv(getUniform(shader, "model"), 1, false, model.toArray());
+        OpenGL.glUniformMatrix4fv(getUniform(shader, "model"), 1, false, model.toArray());
 
         // render textured quad
-        glUniform4f(getUniform(shader, "spriteColor"), r, g, b, a);
+        OpenGL.glUniform4f(getUniform(shader, "spriteColor"), r, g, b, a);
 
-        glActiveTexture(GL_TEXTURE0);
+        OpenGL.glActiveTexture(OpenGL.GL_TEXTURE0);
         texture.bind();
 
         drawFrame();
@@ -119,20 +119,19 @@ final class TextureRenderer implements Renderer, Disposable {
     private int getUniform(int shader, String name) {
         Integer uniform = uniforms.get(name);
         if (uniform == null) {
-            uniform = glGetUniformLocation(shader, name);
+            uniform = OpenGL.glGetUniformLocation(shader, name);
             uniforms.put(name, uniform);
         }
         return uniform;
     }
 
     public void setProjection(Matrix4f projection) {
-        glUseProgram(shader);
-        glUniformMatrix4fv(getUniform(shader, "projection"), 1, false, projection.toArray());
+        OpenGL.glUseProgram(shader);
+        OpenGL.glUniformMatrix4fv(getUniform(shader, "projection"), 1, false, projection.toArray());
     }
 
-    @Override
     public void dispose() {
-        glDeleteVertexArrays(quadVAO);
+        OpenGL.glDeleteVertexArrays(quadVAO);
     }
 
     @Override
@@ -142,9 +141,9 @@ final class TextureRenderer implements Renderer, Disposable {
 
     @Override
     public void drawFrame() {
-        glBindVertexArray(quadVAO);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, MemorySegment.NULL);
-        glBindVertexArray(0);
+        OpenGL.glBindVertexArray(quadVAO);
+        OpenGL.glDrawElements(OpenGL.GL_TRIANGLES, 6, OpenGL.GL_UNSIGNED_INT, MemorySegment.NULL);
+        OpenGL.glBindVertexArray(0);
     }
 
     @Override

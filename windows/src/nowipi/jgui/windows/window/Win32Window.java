@@ -1,6 +1,6 @@
 package nowipi.jgui.windows.window;
 
-import nowipi.jgui.opengl.GraphicsContext;
+import nowipi.opengl.GraphicsContext;
 import nowipi.jgui.window.PixelFormat;
 import nowipi.jgui.window.Window;
 import nowipi.jgui.window.event.MapEventDispatcher;

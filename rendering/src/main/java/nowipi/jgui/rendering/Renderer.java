@@ -1,6 +1,6 @@
-package testing;
+package nowipi.jgui.rendering;
 
-interface Renderer {
+public interface Renderer {
 
     void beginFrame();
     void drawFrame();

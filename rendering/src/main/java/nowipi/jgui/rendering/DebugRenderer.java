@@ -1,4 +1,4 @@
-package testing;
+package nowipi.jgui.rendering;
 
 abstract class DebugRenderer implements Renderer {
 

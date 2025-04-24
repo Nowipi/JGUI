@@ -1,5 +1,7 @@
 package testing;
 
+import nowipi.jgui.rendering.OpenGLTexture;
+
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.FileNotFoundException;

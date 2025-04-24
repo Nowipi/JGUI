@@ -159,28 +159,4 @@ public final class User32 {
             throw new RuntimeException(e);
         }
     }
-
-    public static MemorySegment beginPaint(MemorySegment hWnd, MemorySegment lpPaint) {
-        try {
-            return (MemorySegment) BeginPaint.handle.invokeExact(hWnd, lpPaint);
-        } catch (Throwable e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static int endPaint(MemorySegment hWnd, MemorySegment lpPaint) {
-        try {
-            return (int) EndPaint.handle.invokeExact(hWnd, lpPaint);
-        } catch (Throwable e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static int postMessageW(MemorySegment hWnd, int Msg, long wParam, long lParam) {
-        try {
-            return (int) PostMessageW.handle.invokeExact(hWnd, Msg, wParam, lParam);
-        } catch (Throwable e) {
-            throw new RuntimeException(e);
-        }
-    }
 }
