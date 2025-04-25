@@ -11,6 +11,17 @@ import nowipi.primitives.Matrix4f;
 public final class TextureRenderer implements Renderer {
 
     private static final int shader;
+    private static final float[] vertices = {
+            // pos      // tex
+            0.0f, 1.0f, 0.0f, 1.0f,
+            1.0f, 0.0f, 1.0f, 0.0f,
+            0.0f, 0.0f, 0.0f, 0.0f,
+            1.0f, 1.0f, 1.0f, 1.0f,
+    };
+    private static final int[] indices = {
+            0, 1, 2,
+            0, 3, 1
+    };
 
     static {
         int vertexShader = OpenGL.glCreateShader(OpenGL.GL_VERTEX_SHADER);
@@ -55,24 +66,9 @@ public final class TextureRenderer implements Renderer {
     private final int quadVAO;
 
     public TextureRenderer() {
-        int VBO;
-        int EBO;
-        float[] vertices = {
-                // pos      // tex
-                0.0f, 1.0f, 0.0f, 1.0f,
-                1.0f, 0.0f, 1.0f, 0.0f,
-                0.0f, 0.0f, 0.0f, 0.0f,
-                1.0f, 1.0f, 1.0f, 1.0f,
-        };
-
-        int[] indices = {
-                0, 1, 2,
-                0, 3, 1
-        };
-
         quadVAO = OpenGL.glGenVertexArrays();
-        VBO = OpenGL.glGenBuffers();
-        EBO = OpenGL.glGenBuffers();
+        int VBO = OpenGL.glGenBuffers();
+        int EBO = OpenGL.glGenBuffers();
 
         OpenGL.glBindVertexArray(quadVAO);
 
@@ -143,7 +139,6 @@ public final class TextureRenderer implements Renderer {
     public void drawFrame() {
         OpenGL.glBindVertexArray(quadVAO);
         OpenGL.glDrawElements(OpenGL.GL_TRIANGLES, 6, OpenGL.GL_UNSIGNED_INT, MemorySegment.NULL);
-        OpenGL.glBindVertexArray(0);
     }
 
     @Override

@@ -1,23 +1,20 @@
 package testing;
 
+import nowipi.jgui.components.styling.Color;
+import nowipi.jgui.rendering.BatchedRectangleRenderer;
 import nowipi.opengl.GraphicsContext;
 import nowipi.opengl.OpenGL;
-import nowipi.jgui.rendering.OpenGLTexture;
-import nowipi.jgui.rendering.TextureRenderer;
 import nowipi.jgui.window.Window;
 import nowipi.jgui.window.event.WindowResizeEvent;
 import nowipi.primitives.Matrix4f;
-
-import java.io.IOException;
+import nowipi.primitives.Rectangle;
 
 import static nowipi.opengl.OpenGL.*;
 
 final class RectTest {
 
     private final Window window;
-    private TextureRenderer renderer;
-    private OpenGLTexture arrowTexture;
-    private OpenGLTexture texture;
+    private BatchedRectangleRenderer renderer;
 
     public RectTest() {
         window = Window.create("Rect test window", 1080, 512);
@@ -29,25 +26,16 @@ final class RectTest {
         graphicsContext.makeCurrent();
         OpenGL.init(graphicsContext);
 
-        renderer = new TextureRenderer();
-
-        try {
-            arrowTexture = ResourceManager.loadTexture("texture.png");
-            texture = ResourceManager.loadTexture("pic.png");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        renderer = new BatchedRectangleRenderer(Matrix4f.ortho(0, window.width(), 0, window.height(), -1, 1));
 
         window.addListener(WindowResizeEvent.class, event -> onResizeWindow(event.width(), event.height()));
 
         window.show();
 
-        renderer.setProjection(Matrix4f.ortho(0, window.width(), 0, window.height(), -1, 1));
         while (!window.shouldClose()) {
             renderFrame();
             window.pollEvents();
         }
-        renderer.dispose();
     }
 
     private void onResizeWindow(int windowWidth, int windowHeight) {
@@ -56,25 +44,18 @@ final class RectTest {
         renderFrame();
     }
 
-    private static final float rotationSpeed = 360f; // degrees per second
-    private float rotation;
-
     long lastTime = System.nanoTime();
     private void renderFrame() {
         long current = System.nanoTime();
         float delta = (current - lastTime) / 1_000_000_000f;
         lastTime = current;
 
-
-        rotation += rotationSpeed * delta;
-
-        renderer.beginFrame();
         glClear(GL_COLOR_BUFFER_BIT);
         glClearColor(1, 1, 1, 1);
-        renderer.drawTexture(arrowTexture, 100, 100, 200, 200, rotation, 1, 1, 1, 1);
-        renderer.drawTexture(texture, 0, 0, 100, 100, 0, 1, 1, 1, 1);
-        window.swapBuffers();
+        renderer.beginFrame();
+        renderer.drawRectangle(Rectangle.fromTopLeft(0, 0, 100, 100), Color.BLUE);
         renderer.endFrame();
+        window.swapBuffers();
     }
 
     public static void main(String[] args) {
