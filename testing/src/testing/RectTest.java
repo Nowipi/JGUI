@@ -53,7 +53,9 @@ final class RectTest {
         glClear(GL_COLOR_BUFFER_BIT);
         glClearColor(1, 1, 1, 1);
         renderer.beginFrame();
-        renderer.drawRectangle(Rectangle.fromTopLeft(0, 0, 100, 100), Color.BLUE);
+        renderer.drawRectangle(Rectangle.fromTopLeft(0, 0, 100, -100), Color.PINK);
+        renderer.drawRectangle(Rectangle.fromCenter(window.width()/2f, window.height()/2f, 100, 100), Color.YELLOW);
+        renderer.drawRectangle(Rectangle.fromTopLeft(window.width() - 100, 0, 100, -100), Color.BLUE);
         renderer.endFrame();
         window.swapBuffers();
     }

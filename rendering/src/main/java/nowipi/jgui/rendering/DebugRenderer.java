@@ -14,11 +14,6 @@ abstract class DebugRenderer implements Renderer {
     }
 
     @Override
-    public void drawFrame() {
-        drawCalls++;
-    }
-
-    @Override
     public void endFrame() {
         System.out.printf("%d draw calls per frame\n", drawCalls);
     }

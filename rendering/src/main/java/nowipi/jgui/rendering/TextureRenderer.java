@@ -8,6 +8,8 @@ import nowipi.opengl.OpenGL;
 import nowipi.primitives.Axis;
 import nowipi.primitives.Matrix4f;
 
+import static nowipi.opengl.OpenGL.GL_FALSE;
+
 public final class TextureRenderer implements Renderer {
 
     private static final int shader;
@@ -78,7 +80,7 @@ public final class TextureRenderer implements Renderer {
         OpenGL.glBindBuffer(OpenGL.GL_ELEMENT_ARRAY_BUFFER, EBO);
         OpenGL.glBufferData(OpenGL.GL_ELEMENT_ARRAY_BUFFER, indices, OpenGL.GL_STATIC_DRAW);
 
-        OpenGL.glVertexAttribPointer(0, 4, OpenGL.GL_FLOAT, false, 4 * Float.BYTES, MemorySegment.NULL);
+        OpenGL.glVertexAttribPointer(0, 4, OpenGL.GL_FLOAT, GL_FALSE, 4 * Float.BYTES, 0);
         OpenGL.glEnableVertexAttribArray(0);
 
         OpenGL.glBindBuffer(OpenGL.GL_ARRAY_BUFFER, 0);
@@ -100,7 +102,7 @@ public final class TextureRenderer implements Renderer {
 
         model = Matrix4f.scale(model, width, height, 1); // last scale
 
-        OpenGL.glUniformMatrix4fv(getUniform(shader, "model"), 1, false, model.toArray());
+        OpenGL.glUniformMatrix4fv(getUniform(shader, "model"), 1, GL_FALSE, model.toArray());
 
         // render textured quad
         OpenGL.glUniform4f(getUniform(shader, "spriteColor"), r, g, b, a);
@@ -108,7 +110,8 @@ public final class TextureRenderer implements Renderer {
         OpenGL.glActiveTexture(OpenGL.GL_TEXTURE0);
         texture.bind();
 
-        drawFrame();
+        OpenGL.glBindVertexArray(quadVAO);
+        OpenGL.glDrawElements(OpenGL.GL_TRIANGLES, 6, OpenGL.GL_UNSIGNED_INT, MemorySegment.NULL);
     }
 
     private final Map<String, Integer> uniforms = new HashMap<>();
@@ -123,7 +126,7 @@ public final class TextureRenderer implements Renderer {
 
     public void setProjection(Matrix4f projection) {
         OpenGL.glUseProgram(shader);
-        OpenGL.glUniformMatrix4fv(getUniform(shader, "projection"), 1, false, projection.toArray());
+        OpenGL.glUniformMatrix4fv(getUniform(shader, "projection"), 1, GL_FALSE, projection.toArray());
     }
 
     public void dispose() {
@@ -133,12 +136,6 @@ public final class TextureRenderer implements Renderer {
     @Override
     public void beginFrame() {
 
-    }
-
-    @Override
-    public void drawFrame() {
-        OpenGL.glBindVertexArray(quadVAO);
-        OpenGL.glDrawElements(OpenGL.GL_TRIANGLES, 6, OpenGL.GL_UNSIGNED_INT, MemorySegment.NULL);
     }
 
     @Override

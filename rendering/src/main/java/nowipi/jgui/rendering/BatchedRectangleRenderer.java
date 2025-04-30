@@ -6,7 +6,8 @@ import nowipi.primitives.Matrix4f;
 import nowipi.primitives.Rectangle;
 
 import java.lang.foreign.MemorySegment;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 import static nowipi.opengl.OpenGL.*;
 
@@ -15,23 +16,12 @@ public final class BatchedRectangleRenderer implements Renderer {
     private static final int shader;
     private static final int projectionUniformLocation;
 
-    private static final float[] vertexPositions = {
-            -0.05f,  0.05f,
-            0.05f, -0.05f,
-            -0.05f, -0.05f,
-
-            -0.05f,  0.05f,
-            0.05f, -0.05f,
-            0.05f,  0.05f,
-    };
-
     static {
         int vertexShader = OpenGL.glCreateShader(OpenGL.GL_VERTEX_SHADER);
         OpenGL.glShaderSource(vertexShader, """
                 #version 330 core
-                layout (location = 0) in vec2 aPosition;
-                layout (location = 1) in vec4 iColor;
-                layout (location = 2) in mat4 iModel;
+                layout (location = 0) in vec2 vPosition;
+                layout (location = 1) in vec4 vColor;
                 
                 uniform mat4 projection;
                 
@@ -39,8 +29,8 @@ public final class BatchedRectangleRenderer implements Renderer {
                 
                 void main()
                 {
-                    fColor = iColor;
-                    gl_Position = projection * iModel * vec4(aPosition, 0.0, 1.0);
+                    fColor = vColor;
+                    gl_Position = projection * vec4(vPosition, 0.0, 1.0);
                 }""");
         OpenGL.glCompileShader(vertexShader);
 
@@ -67,36 +57,31 @@ public final class BatchedRectangleRenderer implements Renderer {
         projectionUniformLocation = OpenGL.glGetUniformLocation(shader, "projection");
     }
 
+    private record RectangleDrawCommand(Rectangle rectangle, Color color) {}
+
     private final int VAO;
-    private final int instanceVBO ;
-    private int rectangleCount;
+    private final int VBO;
+    private final int EBO;
+    private final List<RectangleDrawCommand> rectangles;
 
     public BatchedRectangleRenderer(Matrix4f projectionMatrix) {
+
+        rectangles = new ArrayList<>(10);
 
         setProjection(projectionMatrix);
 
         VAO = glGenVertexArrays();
         glBindVertexArray(VAO);
 
-        int VBO = glGenBuffers();
+        VBO = glGenBuffers();
+        EBO = glGenBuffers();
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glBufferData(GL_ARRAY_BUFFER, vertexPositions, GL_STATIC_DRAW);
-        glVertexAttribPointer(0, 2, GL_FLOAT, false, 2 * Float.BYTES, MemorySegment.ofAddress(0));
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 6 * Float.BYTES, 0);
         glEnableVertexAttribArray(0);
 
-        instanceVBO  = glGenBuffers();
-        glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
-        glBufferData(GL_ARRAY_BUFFER,  5 * 20 * Float.BYTES, MemorySegment.NULL, GL_DYNAMIC_DRAW);
-
-        glVertexAttribPointer(1, 4, GL_FLOAT, false, 20 * Float.BYTES, MemorySegment.ofAddress(0));
+        glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 6 * Float.BYTES, 2 * Float.BYTES);
         glEnableVertexAttribArray(1);
-        glVertexAttribDivisor(1, 1);
-
-        for (int i = 0; i < 4; i++) {
-            glVertexAttribPointer(2 + i, 4, GL_FLOAT, false, 20 * Float.BYTES, MemorySegment.ofAddress(i * 4 * Float.BYTES));
-            glEnableVertexAttribArray(2 + i);
-            glVertexAttribDivisor(2 + i, 1);
-        }
 
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -104,41 +89,78 @@ public final class BatchedRectangleRenderer implements Renderer {
     }
 
     public void drawRectangle(Rectangle rectangle, Color color) {
-        float[] vertexData = {
-                color.r(), color.g(), color.b(), color.a(),
-                rectangle.width(), 0, 0, 0,
-                0, rectangle.height(),0, 0,
-                0, 0, 1, 0,
-                rectangle.topLeft.x, rectangle.topLeft.y, 0, 1,
-        };
-
-        System.out.println(Arrays.toString(vertexData));
-
-        OpenGL.glBindBuffer(OpenGL.GL_ARRAY_BUFFER, instanceVBO);
-        OpenGL.glBufferSubData(OpenGL.GL_ARRAY_BUFFER, rectangleCount * 20 * Float.BYTES, vertexData);
-        rectangleCount++;
+        rectangles.add(new RectangleDrawCommand(rectangle, color));
     }
 
     @Override
     public void beginFrame() {
-        rectangleCount = 0;
-
-    }
-
-    @Override
-    public void drawFrame() {
-
+        rectangles.clear();
     }
 
     @Override
     public void endFrame() {
-        OpenGL.glUseProgram(shader);
+
+        int rectangleCount = rectangles.size();
+        float[] vertexData = new float[rectangleCount * 6 * 4];
+        int[] indexData = new int[rectangleCount * 6];
+        int vertexDataIndex = 0;
+        int indexDataIndex = 0;
+        for (int i = 0; i < rectangles.size(); i++) {
+            var command = rectangles.get(i);
+            var rectangle = command.rectangle;
+            Color color = command.color;
+            vertexData[vertexDataIndex++] = rectangle.topLeft.x;
+            vertexData[vertexDataIndex++] = rectangle.topLeft.y;
+            vertexData[vertexDataIndex++] = color.r();
+            vertexData[vertexDataIndex++] = color.g();
+            vertexData[vertexDataIndex++] = color.b();
+            vertexData[vertexDataIndex++] = color.a();
+
+            vertexData[vertexDataIndex++] = rectangle.topRight.x;
+            vertexData[vertexDataIndex++] = rectangle.topRight.y;
+            vertexData[vertexDataIndex++] = color.r();
+            vertexData[vertexDataIndex++] = color.g();
+            vertexData[vertexDataIndex++] = color.b();
+            vertexData[vertexDataIndex++] = color.a();
+
+            vertexData[vertexDataIndex++] = rectangle.bottomRight.x;
+            vertexData[vertexDataIndex++] = rectangle.bottomRight.y;
+            vertexData[vertexDataIndex++] = color.r();
+            vertexData[vertexDataIndex++] = color.g();
+            vertexData[vertexDataIndex++] = color.b();
+            vertexData[vertexDataIndex++] = color.a();
+
+            vertexData[vertexDataIndex++] = rectangle.bottomLeft.x;
+            vertexData[vertexDataIndex++] = rectangle.bottomLeft.y;
+            vertexData[vertexDataIndex++] = color.r();
+            vertexData[vertexDataIndex++] = color.g();
+            vertexData[vertexDataIndex++] = color.b();
+            vertexData[vertexDataIndex++] = color.a();
+
+            int vertexBase = i * 4;
+            indexData[indexDataIndex++] = vertexBase + 0;
+            indexData[indexDataIndex++] = vertexBase + 1;
+            indexData[indexDataIndex++] = vertexBase + 2;
+
+            indexData[indexDataIndex++] = vertexBase + 0;
+            indexData[indexDataIndex++] = vertexBase + 2;
+            indexData[indexDataIndex++] = vertexBase + 3;
+        }
+
+
         OpenGL.glBindVertexArray(VAO);
-        OpenGL.glDrawArraysInstanced(GL_TRIANGLES, 0, 6, rectangleCount);
+        OpenGL.glBindBuffer(OpenGL.GL_ARRAY_BUFFER, VBO);
+        glBufferData(GL_ARRAY_BUFFER, vertexData, GL_DYNAMIC_DRAW);
+
+        OpenGL.glBindBuffer(OpenGL.GL_ELEMENT_ARRAY_BUFFER, EBO);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexData, GL_DYNAMIC_DRAW);
+
+        OpenGL.glUseProgram(shader);
+        OpenGL.glDrawElements(GL_TRIANGLES, 6 * rectangleCount, GL_UNSIGNED_INT, MemorySegment.ofAddress(0));
     }
 
     public void setProjection(Matrix4f projection) {
         OpenGL.glUseProgram(shader);
-        OpenGL.glUniformMatrix4fv(projectionUniformLocation, 1, false, projection.toArray());
+        OpenGL.glUniformMatrix4fv(projectionUniformLocation, 1, GL_FALSE, projection.toArray());
     }
 }
