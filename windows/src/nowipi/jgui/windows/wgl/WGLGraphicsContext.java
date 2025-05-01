@@ -21,7 +21,7 @@ public final class WGLGraphicsContext implements GraphicsContext {
         int[] contextAttribs = {
                 Opengl32.WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
                 Opengl32.WGL_CONTEXT_MINOR_VERSION_ARB, 3,
-                Opengl32.WGL_CONTEXT_FLAGS_ARB, 0,
+                Opengl32.WGL_CONTEXT_PROFILE_MASK_ARB, Opengl32.WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
                 0
         };
         hRC = Opengl32.wglCreateContextAttribsARB(hDC, MemorySegment.NULL, contextAttribs);
