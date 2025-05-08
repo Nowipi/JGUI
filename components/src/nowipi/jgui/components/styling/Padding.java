@@ -18,6 +18,16 @@ public final class Padding {
         return new Padding(uniform, uniform, uniform, uniform);
     }
 
+    @Override
+    public String toString() {
+        return "Padding{" +
+                "left=" + left +
+                ", right=" + right +
+                ", top=" + top +
+                ", bottom=" + bottom +
+                '}';
+    }
+
     public static final class Builder {
 
         private float left = 0;

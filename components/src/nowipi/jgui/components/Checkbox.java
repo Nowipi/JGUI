@@ -1,6 +1,6 @@
 package nowipi.jgui.components;
 
-public abstract class Checkbox extends Component implements Interactable {
+public class Checkbox extends Component {
 
     private boolean checked;
 
@@ -8,15 +8,22 @@ public abstract class Checkbox extends Component implements Interactable {
         this.checked = checked;
     }
 
-    @Override
-    public void interact() {
-        checked = !checked;
-        check();
+    public static Checkbox newUnchecked() {
+        return new Checkbox(false);
     }
-
-    protected abstract void check();
 
     public boolean checked() {
         return checked;
+    }
+
+    public void setChecked(boolean checked) {
+        this.checked = checked;
+    }
+
+    @Override
+    public String toString() {
+        return "Checkbox{" +
+                "checked=" + checked +
+                '}';
     }
 }

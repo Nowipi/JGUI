@@ -14,6 +14,16 @@ public final class Styling {
         this.size = size;
     }
 
+    @Override
+    public String toString() {
+        return "Styling{" +
+                "padding=" + padding +
+                ", size=" + size +
+                ", border=" + border +
+                ", backgroundColor=" + backgroundColor +
+                '}';
+    }
+
     public static final class Builder {
         private Padding padding = Padding.newUniform(0);
         private Size size = new Size(new Fit(), new Fit());

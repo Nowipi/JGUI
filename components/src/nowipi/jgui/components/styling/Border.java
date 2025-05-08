@@ -18,6 +18,16 @@ public final class Border {
         return new Border(uniform, uniform, uniform, uniform);
     }
 
+    @Override
+    public String toString() {
+        return "Border{" +
+                "left=" + left +
+                ", right=" + right +
+                ", top=" + top +
+                ", bottom=" + bottom +
+                '}';
+    }
+
     public static final class Builder {
 
         private float left = 0;

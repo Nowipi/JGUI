@@ -11,27 +11,22 @@ final class TestGUI {
 
     public TestGUI() {
         window = Window.create("Test GUI", 500, 500);
-        gui = new GUI(new Container(
-                new Styling.Builder()
+        gui = new GUI(
+                new Container(new Styling.Builder()
                         .backgroundColor(Color.BLUE)
                         .padding(Padding.newUniform(32))
                         .build(),
-                new Layout.Builder()
-                        .gap(32)
-                        .build(),
-                new Container(
-                        new Styling.Builder()
+                        new Layout.Builder()
+                                .gap(32)
+                                .build(),
+                        new Container(new Styling.Builder()
                                 .fixedSize(300, 300)
                                 .backgroundColor(Color.PINK)
-                                .build()
-                ),
-                new Container(
-                        new Styling.Builder()
+                                .build()),
+                        new Container(new Styling.Builder()
                                 .fixedSize(300, 300)
                                 .backgroundColor(Color.YELLOW)
-                                .build()
-                )
-        ));
+                                .build())));
     }
 
     public void show() {

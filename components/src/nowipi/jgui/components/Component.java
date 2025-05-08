@@ -17,4 +17,11 @@ public abstract class Component {
     public Styling styling() {
         return styling;
     }
+
+    @Override
+    public String toString() {
+        return "Component{" +
+                "styling=" + styling +
+                '}';
+    }
 }

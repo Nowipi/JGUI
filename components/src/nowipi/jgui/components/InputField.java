@@ -1,6 +1,6 @@
 package nowipi.jgui.components;
 
-public class TextInput extends Component {
+public class InputField extends Component {
 
     private final StringBuffer text = new StringBuffer();
 
@@ -15,5 +15,12 @@ public class TextInput extends Component {
     public void inputText(String text) {
         clear();
         this.text.append(text);
+    }
+
+    @Override
+    public String toString() {
+        return "InputField{" +
+                "text=" + text +
+                '}';
     }
 }
