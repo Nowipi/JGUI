@@ -67,7 +67,7 @@ public final class TextureRenderer implements Renderer {
 
     private final int quadVAO;
 
-    public TextureRenderer() {
+    public TextureRenderer(Matrix4f projection) {
         quadVAO = OpenGL.glGenVertexArrays();
         int VBO = OpenGL.glGenBuffers();
         int EBO = OpenGL.glGenBuffers();
@@ -88,7 +88,9 @@ public final class TextureRenderer implements Renderer {
 
 
         OpenGL.glUseProgram(shader);
-        OpenGL.glUniform1i(getUniform(shader, "image"), 0);
+        OpenGL.glUniform1i(getUniform("image"), 0);
+
+        setProjection(projection);
     }
 
     public void drawTexture(OpenGLTexture texture, int x, int y, int width, int height, float rotation, float r, float g, float b, float a) {
@@ -102,10 +104,10 @@ public final class TextureRenderer implements Renderer {
 
         model = Matrix4f.scale(model, width, height, 1); // last scale
 
-        OpenGL.glUniformMatrix4fv(getUniform(shader, "model"), 1, GL_FALSE, model.toArray());
+        OpenGL.glUniformMatrix4fv(getUniform("model"), 1, GL_FALSE, model.toArray());
 
         // render textured quad
-        OpenGL.glUniform4f(getUniform(shader, "spriteColor"), r, g, b, a);
+        OpenGL.glUniform4f(getUniform("spriteColor"), r, g, b, a);
 
         OpenGL.glActiveTexture(OpenGL.GL_TEXTURE0);
         texture.bind();
@@ -115,7 +117,7 @@ public final class TextureRenderer implements Renderer {
     }
 
     private final Map<String, Integer> uniforms = new HashMap<>();
-    private int getUniform(int shader, String name) {
+    private int getUniform(String name) {
         Integer uniform = uniforms.get(name);
         if (uniform == null) {
             uniform = OpenGL.glGetUniformLocation(shader, name);
@@ -126,7 +128,7 @@ public final class TextureRenderer implements Renderer {
 
     public void setProjection(Matrix4f projection) {
         OpenGL.glUseProgram(shader);
-        OpenGL.glUniformMatrix4fv(getUniform(shader, "projection"), 1, GL_FALSE, projection.toArray());
+        OpenGL.glUniformMatrix4fv(getUniform("projection"), 1, GL_FALSE, projection.toArray());
     }
 
     public void dispose() {

@@ -11,7 +11,7 @@ public final class Fixed implements SizingMode {
     }
 
     @Override
-    public float size(Component component) {
+    public float calculate(Component parent, Component child) {
         return size;
     }
 

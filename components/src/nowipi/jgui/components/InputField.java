@@ -1,8 +1,21 @@
 package nowipi.jgui.components;
 
+import nowipi.jgui.components.styling.Color;
+import nowipi.jgui.components.styling.ContainerLayout;
+import nowipi.jgui.components.styling.Styling;
+
 public class InputField extends Component {
 
     private final StringBuffer text = new StringBuffer();
+
+    public InputField() {
+        super(new Styling.Builder()
+                .backgroundColor(Color.YELLOW)
+                .build(),
+                new ContainerLayout.Builder()
+                        .build()
+        );
+    }
 
     public String text() {
         return text.toString();

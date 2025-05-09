@@ -1,28 +1,54 @@
 package nowipi.jgui.components.styling;
 
-public final class Layout {
-    public Object direction;
-    public float gap;
-    public Alignment alignement;
+import nowipi.jgui.components.Component;
 
-    public Layout(Object direction, float gap, Alignment alignement) {
-        this.direction = direction;
-        this.gap = gap;
-        this.alignement = alignement;
+/**
+ * A layout influences a Component's size and position, or it's children's.
+ */
+public class Layout {
+
+    public final Size size;
+
+    public Layout(Size size) {
+        this.size = size;
     }
 
-    public static final class Builder {
-        private Object direction;
-        private float gap = 0;
-        private Alignment alignement = new Alignment(Position.LEFT, Position.TOP);
+    public void layout(Component component) {
+        component.width = size.width.calculate(component, null);
+        component.height = size.height.calculate(component, null);
+        component.x = 0;
+        component.y = 0;
+    }
 
-        public Builder gap(float gap) {
-            this.gap = gap;
+
+
+    public static class Builder<L extends Layout> {
+        protected Size size = new Size(new Fit(), new Fit());
+
+        public Builder<L> size(SizingMode width, SizingMode height) {
+            this.size.width = width;
+            this.size.height = height;
             return this;
         }
 
-        public Layout build() {
-            return new Layout(direction, gap, alignement);
+        public Builder<L> size(Size size) {
+            this.size = size;
+            return this;
         }
+
+        public Builder<L> width(SizingMode width) {
+            this.size.width = width;
+            return this;
+        }
+
+        public Builder<L> height(SizingMode height) {
+            this.size.height = height;
+            return this;
+        }
+
+        public L build() {
+            return (L)new Layout(size);
+        }
+
     }
 }

@@ -1,30 +1,33 @@
 package nowipi.jgui.components;
 
-import nowipi.jgui.components.styling.Layout;
+import nowipi.jgui.components.styling.ContainerLayout;
 import nowipi.jgui.components.styling.Styling;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 public class Container extends Component {
 
     private final List<Component> children;
-    public final Layout layout;
+    public final ContainerLayout layout;
+
+    public Container(Styling styling, ContainerLayout layout, List<Component> children) {
+        super(styling, layout);
+        this.children = children;
+        this.layout = layout;
+    }
 
     public Container(List<Component> children) {
-        layout = new Layout.Builder().build();
-        this.children = children;
+        this(new Styling.Builder().build(), new ContainerLayout.Builder().build(), children);
     }
 
-    public Container(Styling styling, Layout layout, List<Component> children) {
-        super(styling);
-        this.layout = layout;
-        this.children = children;
+    public Container(ContainerLayout layout, List<Component> children) {
+        this(new Styling.Builder().build(), layout, children);
     }
 
-    public Container(Layout layout, List<Component> children) {
-        this.layout = layout;
-        this.children = children;
+    public Container(Styling styling, ContainerLayout layout) {
+        this(styling, layout, new ArrayList<>());
     }
 
     //Why no factory? Because this makes extending consistent with instancing
@@ -33,14 +36,14 @@ public class Container extends Component {
     }
 
     public Container(Styling styling, Component ...children) {
-        this(styling, new Layout.Builder().build(), List.of(children));
+        this(styling, new ContainerLayout.Builder().build(), List.of(children));
     }
 
-    public Container(Layout layout, Component ...children) {
+    public Container(ContainerLayout layout, Component ...children) {
         this(layout, List.of(children));
     }
 
-    public Container(Styling styling, Layout layout, Component ...children) {
+    public Container(Styling styling, ContainerLayout layout, Component ...children) {
         this(styling, layout, List.of(children));
     }
 

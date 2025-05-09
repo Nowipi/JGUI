@@ -50,11 +50,6 @@ final class TodoGUI extends Container {
         }
     }
 
-    public static void main(String[] args) {
-        TodoGUI gui = new TodoGUI();
-        System.out.println(getTree(gui));
-    }
-
     public static String getTree(Component component) {
         return getTree(component, 0);
     }

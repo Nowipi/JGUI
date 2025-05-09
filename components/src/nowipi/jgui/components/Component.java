@@ -1,21 +1,22 @@
 package nowipi.jgui.components;
 
+import nowipi.jgui.components.styling.Layout;
 import nowipi.jgui.components.styling.Styling;
 
 public abstract class Component {
 
     public final Styling styling;
+    public final Layout layout;
+    public float x;
+    public float y;
+    public float width;
+    public float height;
 
-    public Component(Styling styling) {
+    public Component(Styling styling, Layout layout) {
         this.styling = styling;
-    }
-
-    public Component() {
-        styling = new Styling.Builder().build();
-    }
-
-    public Styling styling() {
-        return styling;
+        this.layout = layout;
+        width = layout.size.width.calculate(this, null);
+        height = layout.size.height.calculate(this, null);
     }
 
     @Override
