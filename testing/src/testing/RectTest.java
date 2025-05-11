@@ -1,6 +1,5 @@
 package testing;
 
-import nowipi.jgui.components.styling.Color;
 import nowipi.jgui.rendering.BatchedRectangleRenderer;
 import nowipi.opengl.GraphicsContext;
 import nowipi.opengl.OpenGL;
@@ -17,7 +16,7 @@ final class RectTest {
     private BatchedRectangleRenderer renderer;
 
     public RectTest() {
-        window = Window.create("Rect test window", 1080, 512);
+        window = Window.createWindowed("Rect test window", 2560, 1440);
     }
 
     public void run() {
@@ -25,6 +24,9 @@ final class RectTest {
         GraphicsContext graphicsContext = window.createGraphicsContext();
         graphicsContext.makeCurrent();
         OpenGL.init(graphicsContext);
+
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         renderer = new BatchedRectangleRenderer(Matrix4f.ortho(0, window.width(), 0, window.height(), -1, 1));
 
@@ -50,12 +52,13 @@ final class RectTest {
         float delta = (current - lastTime) / 1_000_000_000f;
         lastTime = current;
 
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(1, 1, 1, 1);
         renderer.beginFrame();
-        renderer.drawRectangle(Rectangle.fromTopLeft(0, 0, 100, -100), Color.PINK);
-        renderer.drawRectangle(Rectangle.fromCenter(window.width()/2f, window.height()/2f, 100, 100), Color.YELLOW);
-        renderer.drawRectangle(Rectangle.fromTopLeft(window.width() - 100, 0, 100, -100), Color.BLUE);
+        renderer.drawRectangle(Rectangle.fromTopLeft(0, 0, 100, -100), 255, 0, 255, 100);
+        renderer.drawRectangle(Rectangle.fromCenter(window.width()/2f, window.height()/2f, 100, 100), 255, 255, 0, 100);
+
+        renderer.drawRectangle(Rectangle.fromTopLeft(window.width() - 100, 0, 100, -100), 0, 0, 255, 100);
         renderer.endFrame();
         window.swapBuffers();
     }

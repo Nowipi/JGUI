@@ -1,9 +1,5 @@
 package testing.todo;
 
-import nowipi.jgui.components.Checkbox;
-import nowipi.jgui.components.Component;
-import nowipi.jgui.components.Container;
-import nowipi.jgui.components.styling.Color;
 import nowipi.jgui.rendering.BatchedRectangleRenderer;
 import nowipi.jgui.rendering.Renderer;
 import nowipi.jgui.rendering.TextureRenderer;
@@ -27,7 +23,7 @@ final class ComponentRenderer implements Renderer {
 
     }
 
-    public void renderComponent(Component component) {
+    /*public void renderComponent(Component component) {
         var componentRect = Rectangle.fromTopLeft(component.x, component.y, component.width, component.height);
         switch (component) {
             case Container container -> {
@@ -36,9 +32,9 @@ final class ComponentRenderer implements Renderer {
                     renderComponent(child);
                 }
             }
-            /*case Text text -> {
+            *//*case Text text -> {
                 textRenderer.drawText(componentRect, text.text());
-            }*/
+            }*//*
             case Checkbox checkbox -> {
                 if (checkbox.checked()) {
                     rectangleRenderer.drawRectangle(componentRect, Color.BLUE);
@@ -48,7 +44,7 @@ final class ComponentRenderer implements Renderer {
             }
             default -> {}
         }
-    }
+    }*/
 
     @Override
     public void endFrame() {

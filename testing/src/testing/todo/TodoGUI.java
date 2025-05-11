@@ -14,7 +14,10 @@ final class TodoGUI extends Container {
         super(
                 new Text("Todo App"),
                 input,
-                new Button("Add", () -> list.addChild(new TodoList.TodoItem(input.text()))),
+                new Button("Add", () -> {
+                    list.addChild(new TodoList.TodoItem(input.text()));
+                    input.clear();
+                }),
                 list
         );
     }
@@ -65,5 +68,9 @@ final class TodoGUI extends Container {
         }
 
         return builder.toString();
+    }
+
+    public static void main(String[] args) {
+        System.out.println(getTree(new TodoGUI()));
     }
 }

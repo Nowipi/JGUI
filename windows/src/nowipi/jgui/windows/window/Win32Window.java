@@ -4,7 +4,6 @@ import nowipi.opengl.GraphicsContext;
 import nowipi.jgui.window.PixelFormat;
 import nowipi.jgui.window.Window;
 import nowipi.jgui.window.event.MapEventDispatcher;
-import nowipi.jgui.window.event.WindowResizeEvent;
 import nowipi.jgui.windows.ffm.Win32;
 import nowipi.jgui.windows.ffm.gdi.GDI32;
 import nowipi.jgui.windows.ffm.gdi.PIXELFORMATDESCRIPTOR;
@@ -22,21 +21,83 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
-public final class Win32Window extends MapEventDispatcher implements Window {
+public class Win32Window extends MapEventDispatcher implements Window {
+
+    private static final MemorySegment CLASS_NAME;
+    private static final Arena arena;
+    private static final Map<MemorySegment, Win32Window> windows;
+
+    static {
+        arena = Arena.ofAuto();
+        CLASS_NAME = arena.allocateFrom("JavaWindow", StandardCharsets.UTF_16LE);
+        MemorySegment wc = WNDCLASSW.allocate(arena);
+        WNDCLASSW.setLpszClassName(wc, CLASS_NAME);
+        try {
+            MethodHandle hWndProc = MethodHandles.lookup().findStatic(Win32Window.class, "windowProc",
+                    MethodType.methodType(long.class,
+                            MemorySegment.class,
+                            int.class,
+                            long.class,
+                            long.class
+                    ));
+            WNDCLASSW.setLpfnWndProc(wc, User32.getWndProcUpCall(hWndProc));
+        } catch (NoSuchMethodException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+
+        WNDCLASSW.sethCursor(wc, User32.loadCursorA(MemorySegment.NULL, User32.IDC_ARROW));
+        WNDCLASSW.setStyle(wc, User32.CS_HREDRAW | User32.CS_VREDRAW | User32.CS_OWNDC);
+
+
+        User32.registerClassW(wc);
+        windows = new HashMap<>();
+    }
+
+    private static long windowProc(MemorySegment hwnd, int uMsg, long wParam, long lParam) {
+        var window = windows.get(hwnd);
+        if (window != null) {
+            switch (uMsg) {
+                case User32.WM_SIZE -> {
+                    int width = Win32.loWord(lParam);
+                    int height = Win32.hiWord(lParam);
+                    window.width = width;
+                    window.height = height;
+                    return 0;
+                }
+                case User32.WM_MOVE -> {
+                    window.x = Win32.loWord(lParam);
+                    window.y = Win32.hiWord(lParam);
+                    return 0;
+                }
+                case User32.WM_PAINT -> {
+                    User32.validateRect(hwnd, MemorySegment.NULL);
+                    return 0;
+
+                }
+            }
+        }
+        return User32.defWindowProcW(hwnd, uMsg, wParam, lParam);
+    }
 
     private final MemorySegment hWnd;
     private final MemorySegment hDC;
+    private int x;
+    private int y;
     private int width;
     private int height;
 
     public Win32Window(String title, int width, int height) {
+        this(title, width, height, User32.WS_POPUP);
+    }
+
+    protected Win32Window(String title, int width, int height, int style) {
         this.width = width;
         this.height = height;
         this.hWnd = User32.createWindowExW(
                 0,
                 CLASS_NAME,
                 arena.allocateFrom(title, StandardCharsets.UTF_16LE),
-                User32.WS_OVERLAPPEDWINDOW,
+                style,
                 User32.CW_USEDEFAULT, User32.CW_USEDEFAULT, width, height,
                 MemorySegment.NULL,
                 MemorySegment.NULL,
@@ -98,6 +159,17 @@ public final class Win32Window extends MapEventDispatcher implements Window {
     }
 
     @Override
+    public String title() {
+        try(Arena arena = Arena.ofConfined()) {
+            int bufferSize = 512;
+            MemorySegment buffer = arena.allocate(bufferSize * 2);
+            User32.getWindowTextW(hWnd, buffer, bufferSize);
+
+            return buffer.getString(0, StandardCharsets.UTF_16LE);
+        }
+    }
+
+    @Override
     public int width() {
         return width;
     }
@@ -108,60 +180,24 @@ public final class Win32Window extends MapEventDispatcher implements Window {
     }
 
     @Override
+    public void setPosition(int x, int y) {
+        User32.setWindowPos(hWnd, MemorySegment.NULL, x, y, 0, 0, User32.SWP_NOZORDER | User32.SWP_NOSIZE);
+    }
+
+    @Override
+    public int x() {
+        return x;
+    }
+
+    @Override
+    public int y() {
+        return y;
+    }
+
+    @Override
     public void dispose() {
         User32.releaseDC(hWnd, hDC);
         User32.destroyWindow(hWnd);
-    }
-
-    private static final MemorySegment CLASS_NAME;
-    private static final Arena arena;
-    private static final Map<MemorySegment, Win32Window> windows;
-
-    static {
-        arena = Arena.ofAuto();
-        CLASS_NAME = arena.allocateFrom("Better Java Gui", StandardCharsets.UTF_16LE);
-        MemorySegment wc = WNDCLASSW.allocate(arena);
-        WNDCLASSW.setLpszClassName(wc, CLASS_NAME);
-        try {
-            MethodHandle hWndProc = MethodHandles.lookup().findStatic(Win32Window.class, "windowProc",
-                    MethodType.methodType(long.class,
-                            MemorySegment.class,
-                            int.class,
-                            long.class,
-                            long.class
-                    ));
-            WNDCLASSW.setLpfnWndProc(wc, User32.getWndProcUpCall(hWndProc));
-        } catch (NoSuchMethodException | IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
-
-        WNDCLASSW.sethCursor(wc, User32.loadCursorA(MemorySegment.NULL, User32.IDC_ARROW));
-        WNDCLASSW.setStyle(wc, User32.CS_HREDRAW | User32.CS_VREDRAW | User32.CS_OWNDC);
-
-
-        User32.registerClassW(wc);
-        windows = new HashMap<>();
-    }
-
-    private static long windowProc(MemorySegment hwnd, int uMsg, long wParam, long lParam) {
-        switch (uMsg) {
-
-            case User32.WM_SIZE -> {
-                var window = windows.get(hwnd);
-                int width = Win32.loWord(lParam);
-                int height = Win32.hiWord(lParam);
-                window.width = width;
-                window.height = height;
-                window.dispatch(WindowResizeEvent.class, new WindowResizeEvent(width, height));
-                return 0;
-            }
-            case User32.WM_PAINT -> {
-                User32.validateRect(hwnd, MemorySegment.NULL);
-                return 0;
-
-            }
-        }
-        return User32.defWindowProcW(hwnd, uMsg, wParam, lParam);
     }
 
     @Override

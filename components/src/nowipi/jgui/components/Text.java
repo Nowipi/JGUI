@@ -1,11 +1,15 @@
 package nowipi.jgui.components;
 
+import nowipi.jgui.components.styling.Layout;
+import nowipi.jgui.components.styling.Styling;
+
 public class Text extends Component {
 
     private String text;
     private Style style;
 
     public Text(String text) {
+        super(new Styling.Builder().build(), new Layout.Builder<>().build());
         this.text = text;
         style = new Style();
     }

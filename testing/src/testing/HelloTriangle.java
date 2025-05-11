@@ -19,7 +19,7 @@ class HelloTriangle {
 
     public static void main(String[] args) {
 
-        Window window = Window.create("Hello, Window!", SCR_WIDTH, SCR_HEIGHT);
+        Window window = Window.createWindowed("Hello, Window!", SCR_WIDTH, SCR_HEIGHT);
 
         window.addListener(WindowResizeEvent.class, e -> glViewport(0, 0, e.width(), e.height()));
 

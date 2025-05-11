@@ -1,10 +1,14 @@
 package nowipi.jgui.components;
 
+import nowipi.jgui.components.styling.Layout;
+import nowipi.jgui.components.styling.Styling;
+
 public class Checkbox extends Component {
 
     private boolean checked;
 
     public Checkbox(boolean checked) {
+        super(new Styling.Builder().build(), new Layout.Builder<>().build());
         this.checked = checked;
     }
 

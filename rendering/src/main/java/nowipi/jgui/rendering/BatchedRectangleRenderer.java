@@ -1,6 +1,5 @@
 package nowipi.jgui.rendering;
 
-import nowipi.jgui.components.styling.Color;
 import nowipi.opengl.OpenGL;
 import nowipi.primitives.Matrix4f;
 import nowipi.primitives.Rectangle;
@@ -29,7 +28,7 @@ public final class BatchedRectangleRenderer implements Renderer {
                 
                 void main()
                 {
-                    fColor = vColor;
+                    fColor = vColor / 255.0f;
                     gl_Position = projection * vec4(vPosition, 0.0, 1.0);
                 }""");
         OpenGL.glCompileShader(vertexShader);
@@ -42,6 +41,8 @@ public final class BatchedRectangleRenderer implements Renderer {
                 
                 void main()
                 {
+                    if(fColor.a < 0.1)
+                        discard;
                     color = fColor;
                 }""");
         OpenGL.glCompileShader(fragmentShader);
@@ -57,7 +58,7 @@ public final class BatchedRectangleRenderer implements Renderer {
         projectionUniformLocation = OpenGL.glGetUniformLocation(shader, "projection");
     }
 
-    private record RectangleDrawCommand(Rectangle rectangle, Color color) {}
+    private record RectangleDrawCommand(Rectangle rectangle, float r, float g, float b, float a) {}
 
     private final int VAO;
     private final int VBO;
@@ -88,8 +89,16 @@ public final class BatchedRectangleRenderer implements Renderer {
         glBindVertexArray(0);
     }
 
-    public void drawRectangle(Rectangle rectangle, Color color) {
-        rectangles.add(new RectangleDrawCommand(rectangle, color));
+    /**
+     * Draws a rectangle to the screen.
+     * @param rectangle the rectangle in screen coordinates
+     * @param r
+     * @param g
+     * @param b
+     * @param a
+     */
+    public void drawRectangle(Rectangle rectangle, float r, float g, float b, float a) {
+        rectangles.add(new RectangleDrawCommand(rectangle, r, g, b, a));
     }
 
     @Override
@@ -108,34 +117,33 @@ public final class BatchedRectangleRenderer implements Renderer {
         for (int i = 0; i < rectangles.size(); i++) {
             var command = rectangles.get(i);
             var rectangle = command.rectangle;
-            Color color = command.color;
             vertexData[vertexDataIndex++] = rectangle.topLeft.x;
             vertexData[vertexDataIndex++] = rectangle.topLeft.y;
-            vertexData[vertexDataIndex++] = color.r();
-            vertexData[vertexDataIndex++] = color.g();
-            vertexData[vertexDataIndex++] = color.b();
-            vertexData[vertexDataIndex++] = color.a();
+            vertexData[vertexDataIndex++] = command.r();
+            vertexData[vertexDataIndex++] = command.g();
+            vertexData[vertexDataIndex++] = command.b();
+            vertexData[vertexDataIndex++] = command.a();
 
             vertexData[vertexDataIndex++] = rectangle.topRight.x;
             vertexData[vertexDataIndex++] = rectangle.topRight.y;
-            vertexData[vertexDataIndex++] = color.r();
-            vertexData[vertexDataIndex++] = color.g();
-            vertexData[vertexDataIndex++] = color.b();
-            vertexData[vertexDataIndex++] = color.a();
+            vertexData[vertexDataIndex++] = command.r();
+            vertexData[vertexDataIndex++] = command.g();
+            vertexData[vertexDataIndex++] = command.b();
+            vertexData[vertexDataIndex++] = command.a();
 
             vertexData[vertexDataIndex++] = rectangle.bottomRight.x;
             vertexData[vertexDataIndex++] = rectangle.bottomRight.y;
-            vertexData[vertexDataIndex++] = color.r();
-            vertexData[vertexDataIndex++] = color.g();
-            vertexData[vertexDataIndex++] = color.b();
-            vertexData[vertexDataIndex++] = color.a();
+            vertexData[vertexDataIndex++] = command.r();
+            vertexData[vertexDataIndex++] = command.g();
+            vertexData[vertexDataIndex++] = command.b();
+            vertexData[vertexDataIndex++] = command.a();
 
             vertexData[vertexDataIndex++] = rectangle.bottomLeft.x;
             vertexData[vertexDataIndex++] = rectangle.bottomLeft.y;
-            vertexData[vertexDataIndex++] = color.r();
-            vertexData[vertexDataIndex++] = color.g();
-            vertexData[vertexDataIndex++] = color.b();
-            vertexData[vertexDataIndex++] = color.a();
+            vertexData[vertexDataIndex++] = command.r();
+            vertexData[vertexDataIndex++] = command.g();
+            vertexData[vertexDataIndex++] = command.b();
+            vertexData[vertexDataIndex++] = command.a();
 
             int vertexBase = i * 4;
             indexData[indexDataIndex++] = vertexBase + 0;

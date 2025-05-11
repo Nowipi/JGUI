@@ -6,6 +6,6 @@ public final class Fit implements SizingMode {
 
     @Override
     public float calculate(Component parent, Component child) {
-        return ;
+        return 0;
     }
 }

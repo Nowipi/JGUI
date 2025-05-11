@@ -1,15 +1,42 @@
 package nowipi.jgui.windows.ffm.user32;
 
+import nowipi.jgui.windows.ffm.C;
 import nowipi.jgui.windows.ffm.Win32;
 
+import java.lang.foreign.FunctionDescriptor;
 import java.lang.foreign.Linker;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.SymbolLookup;
 import java.lang.invoke.MethodHandle;
 
 public final class User32 {
-
-    public static final int WS_OVERLAPPEDWINDOW = 0x00080000 | 0x00040000 | 0x00020000 | 0x00010000;
+    public static final int WS_BORDER = 0x00800000;
+    public static final int WS_CAPTION = 0x00C00000;
+    public static final int WS_CHILD = 0x40000000;
+    public static final int WS_CHILDWINDOW = 0x40000000;
+    public static final int WS_CLIPCHILDREN	= 0x02000000;
+    public static final int WS_CLIPSIBLINGS	= 0x04000000;
+    public static final int WS_DISABLED	= 0x08000000;
+    public static final int WS_DLGFRAME	= 0x00400000;
+    public static final int WS_GROUP	= 0x00020000;
+    public static final int WS_HSCROLL	= 0x00100000;
+    public static final int WS_ICONIC	= 0x20000000;
+    public static final int WS_MAXIMIZE	= 0x01000000;
+    public static final int WS_MAXIMIZEBOX	= 0x00010000;
+    public static final int WS_MINIMIZE	= 0x20000000;
+    public static final int WS_MINIMIZEBOX	= 0x00020000;
+    public static final int WS_OVERLAPPED	= 0x00000000;
+    public static final int WS_OVERLAPPEDWINDOW	= 0x00CF0000;
+    public static final int WS_POPUP	= 0x80000000;
+    public static final int WS_POPUPWINDOW	= 0x80880000;
+    public static final int WS_SIZEBOX	= 0x00040000;
+    public static final int WS_SYSMENU	= 0x00080000;
+    public static final int WS_TABSTOP	= 0x00010000;
+    public static final int WS_THICKFRAME	= 0x00040000;
+    public static final int WS_TILED	= 0x00000000;
+    public static final int WS_TILEDWINDOW	= 0x00CF0000;
+    public static final int WS_VISIBLE	= 0x10000000;
+    public static final int WS_VSCROLL	= 0x00200000;
     public static final int CW_USEDEFAULT = 0x80000000;
     public static final int SW_SHOW = 5;
     public static final int PM_REMOVE = 0x0001;
@@ -29,11 +56,15 @@ public final class User32 {
     public static final int CS_VREDRAW = 0x002;
     public static final int CS_OWNDC = 0x0020;
 
+    public static final int SWP_NOZORDER = 0x0004;
+    public static final int SWP_NOSIZE = 0x0001;
+
 
 
     public static final MemorySegment IDC_ARROW = MemorySegment.ofAddress(32512L);
 
     public static final SymbolLookup lookup;
+    public static final int WS_EX_NOPARENTNOTIFY = 0x00000004;
 
     static {
         lookup = SymbolLookup.libraryLookup(System.mapLibraryName("user32"), Win32.arena);
@@ -155,6 +186,24 @@ public final class User32 {
     public static int releaseDC(MemorySegment hWnd, MemorySegment hDC) {
         try {
             return (int) ReleaseDC.handle.invokeExact(hWnd, hDC);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final FunctionDescriptor setWindowPosDescriptor = FunctionDescriptor.ofVoid(C.POINTER, C.POINTER, C.INT, C.INT, C.INT, C.INT, C.INT);
+    public static void setWindowPos(MemorySegment hWnd, MemorySegment hWndInsertAfter, int X, int Y, int cx, int cy, int uFlags) {
+        try {
+            Linker.nativeLinker().downcallHandle(User32.lookup.find("SetWindowPos").orElseThrow(), setWindowPosDescriptor).invokeExact(hWnd, hWndInsertAfter, X, Y, cx, cy, uFlags);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final FunctionDescriptor getWindowTextWDescriptor = FunctionDescriptor.of(C.INT, C.POINTER, C.POINTER, C.INT);
+    public static int getWindowTextW(MemorySegment hWnd, MemorySegment lpString, int nMaxCount) {
+        try {
+            return (int) Linker.nativeLinker().downcallHandle(User32.lookup.find("GetWindowTextW").orElseThrow(), getWindowTextWDescriptor).invokeExact(hWnd, lpString, nMaxCount);
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
