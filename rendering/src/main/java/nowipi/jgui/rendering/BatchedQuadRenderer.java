@@ -2,7 +2,7 @@ package nowipi.jgui.rendering;
 
 import nowipi.opengl.OpenGL;
 import nowipi.primitives.Matrix4f;
-import nowipi.primitives.Rectangle;
+import nowipi.primitives.Quad;
 
 import java.lang.foreign.MemorySegment;
 import java.util.ArrayList;
@@ -10,7 +10,7 @@ import java.util.List;
 
 import static nowipi.opengl.OpenGL.*;
 
-public final class BatchedRectangleRenderer implements Renderer {
+public final class BatchedQuadRenderer implements Renderer {
 
     private static final int shader;
     private static final int projectionUniformLocation;
@@ -58,16 +58,16 @@ public final class BatchedRectangleRenderer implements Renderer {
         projectionUniformLocation = OpenGL.glGetUniformLocation(shader, "projection");
     }
 
-    private record RectangleDrawCommand(Rectangle rectangle, float r, float g, float b, float a) {}
+    private record QuadDrawCommand(Quad quad, float r, float g, float b, float a) {}
 
     private final int VAO;
     private final int VBO;
     private final int EBO;
-    private final List<RectangleDrawCommand> rectangles;
+    private final List<QuadDrawCommand> quads;
 
-    public BatchedRectangleRenderer(Matrix4f projectionMatrix) {
+    public BatchedQuadRenderer(Matrix4f projectionMatrix) {
 
-        rectangles = new ArrayList<>(10);
+        quads = new ArrayList<>(10);
 
         setProjection(projectionMatrix);
 
@@ -90,56 +90,56 @@ public final class BatchedRectangleRenderer implements Renderer {
     }
 
     /**
-     * Draws a rectangle to the screen.
-     * @param rectangle the rectangle in screen coordinates
+     * Draws a quad to the screen.
+     * @param quad the quad in screen coordinates
      * @param r
      * @param g
      * @param b
      * @param a
      */
-    public void drawRectangle(Rectangle rectangle, float r, float g, float b, float a) {
-        rectangles.add(new RectangleDrawCommand(rectangle, r, g, b, a));
+    public void drawQuad(Quad quad, float r, float g, float b, float a) {
+        quads.add(new QuadDrawCommand(quad, r, g, b, a));
     }
 
     @Override
     public void beginFrame() {
-        rectangles.clear();
+        quads.clear();
     }
 
     @Override
     public void endFrame() {
 
-        int rectangleCount = rectangles.size();
+        int rectangleCount = quads.size();
         float[] vertexData = new float[rectangleCount * 6 * 4];
         int[] indexData = new int[rectangleCount * 6];
         int vertexDataIndex = 0;
         int indexDataIndex = 0;
-        for (int i = 0; i < rectangles.size(); i++) {
-            var command = rectangles.get(i);
-            var rectangle = command.rectangle;
-            vertexData[vertexDataIndex++] = rectangle.topLeft.x;
-            vertexData[vertexDataIndex++] = rectangle.topLeft.y;
+        for (int i = 0; i < quads.size(); i++) {
+            var command = quads.get(i);
+            var quad = command.quad;
+            vertexData[vertexDataIndex++] = quad.topLeft.x;
+            vertexData[vertexDataIndex++] = quad.topLeft.y;
             vertexData[vertexDataIndex++] = command.r();
             vertexData[vertexDataIndex++] = command.g();
             vertexData[vertexDataIndex++] = command.b();
             vertexData[vertexDataIndex++] = command.a();
 
-            vertexData[vertexDataIndex++] = rectangle.topRight.x;
-            vertexData[vertexDataIndex++] = rectangle.topRight.y;
+            vertexData[vertexDataIndex++] = quad.topRight.x;
+            vertexData[vertexDataIndex++] = quad.topRight.y;
             vertexData[vertexDataIndex++] = command.r();
             vertexData[vertexDataIndex++] = command.g();
             vertexData[vertexDataIndex++] = command.b();
             vertexData[vertexDataIndex++] = command.a();
 
-            vertexData[vertexDataIndex++] = rectangle.bottomRight.x;
-            vertexData[vertexDataIndex++] = rectangle.bottomRight.y;
+            vertexData[vertexDataIndex++] = quad.bottomRight.x;
+            vertexData[vertexDataIndex++] = quad.bottomRight.y;
             vertexData[vertexDataIndex++] = command.r();
             vertexData[vertexDataIndex++] = command.g();
             vertexData[vertexDataIndex++] = command.b();
             vertexData[vertexDataIndex++] = command.a();
 
-            vertexData[vertexDataIndex++] = rectangle.bottomLeft.x;
-            vertexData[vertexDataIndex++] = rectangle.bottomLeft.y;
+            vertexData[vertexDataIndex++] = quad.bottomLeft.x;
+            vertexData[vertexDataIndex++] = quad.bottomLeft.y;
             vertexData[vertexDataIndex++] = command.r();
             vertexData[vertexDataIndex++] = command.g();
             vertexData[vertexDataIndex++] = command.b();

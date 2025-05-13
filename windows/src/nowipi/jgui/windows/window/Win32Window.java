@@ -1,5 +1,6 @@
 package nowipi.jgui.windows.window;
 
+import nowipi.jgui.window.event.WindowResizeEvent;
 import nowipi.opengl.GraphicsContext;
 import nowipi.jgui.window.PixelFormat;
 import nowipi.jgui.window.Window;
@@ -62,6 +63,7 @@ public class Win32Window extends MapEventDispatcher implements Window {
                     int height = Win32.hiWord(lParam);
                     window.width = width;
                     window.height = height;
+                    window.dispatch(WindowResizeEvent.class, new WindowResizeEvent(width, height));
                     return 0;
                 }
                 case User32.WM_MOVE -> {
