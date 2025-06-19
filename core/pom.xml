@@ -9,7 +9,7 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>rendering</artifactId>
+    <artifactId>core</artifactId>
 
     <properties>
         <maven.compiler.source>24</maven.compiler.source>
@@ -20,8 +20,15 @@
     <dependencies>
         <dependency>
             <groupId>nowipi</groupId>
-            <artifactId>primitives</artifactId>
+            <artifactId>components</artifactId>
             <version>1.0-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>nowipi</groupId>
+            <artifactId>rendering</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
