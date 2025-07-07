@@ -3,7 +3,6 @@ package nowipi.jgui.windows.ffm.user32;
 import io.github.nowipi.ffm.processor.annotations.Function;
 import io.github.nowipi.ffm.processor.annotations.Library;
 
-import java.lang.foreign.Linker;
 import java.lang.foreign.MemorySegment;
 
 @Library("user32")

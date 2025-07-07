@@ -8,16 +8,12 @@ import nowipi.jgui.components.styling.Grow;
 import nowipi.jgui.components.styling.Styling;
 import nowipi.jgui.window.Window;
 import nowipi.opengl.GraphicsContext;
-import nowipi.opengl.OpenGL;
 
 final class GUI {
 
     public static void main(String[] args) {
         Window window = Window.createWindowed("Window title", 1080, 720);
         GraphicsContext gc = window.createGraphicsContext();
-        gc.makeCurrent();
-
-        OpenGL.init(gc);
 
         window.show();
 

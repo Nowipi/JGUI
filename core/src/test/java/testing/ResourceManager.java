@@ -1,6 +1,7 @@
 package testing;
 
 import nowipi.jgui.rendering.OpenGLTexture;
+import nowipi.opengl.GraphicsContext;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -9,7 +10,7 @@ import java.io.IOException;
 
 final class ResourceManager {
 
-    public static OpenGLTexture loadTexture(String fileName) throws IOException {
+    public static OpenGLTexture loadTexture(String fileName, GraphicsContext gc) throws IOException {
         try(var in = ResourceManager.class.getResourceAsStream(fileName)) {
             if (in == null)
                 throw new FileNotFoundException(fileName);
@@ -36,7 +37,7 @@ final class ResourceManager {
                 }
             }
 
-            return new OpenGLTexture(width, height, rgbaPixels);
+            return new OpenGLTexture(width, height, rgbaPixels, gc);
         }
     }
 

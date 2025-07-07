@@ -1,7 +1,6 @@
 package testing;
 
 import nowipi.jgui.window.Window;
-import nowipi.opengl.OpenGL;
 
 import static nowipi.opengl.OpenGL.*;
 
@@ -11,16 +10,14 @@ final class WindowChangeTest {
         Window firstWindow = Window.createWindowed("Bruh", 1080 , 720);
 
         var gc = firstWindow.createGraphicsContext();
-        gc.makeCurrent();
-        OpenGL.init(gc);
 
         firstWindow.show();
 
         while (!firstWindow.shouldClose()) {
             firstWindow.pollEvents();
 
-            glClear(GL_COLOR_BUFFER_BIT);
-            glClearColor(1, 1, 1, 1);
+            gc.glClear(GL_COLOR_BUFFER_BIT);
+            gc.glClearColor(1, 1, 1, 1);
             firstWindow.swapBuffers();
         }
 
@@ -32,15 +29,13 @@ final class WindowChangeTest {
         firstWindow.close();
 
         gc = secondWindow.createGraphicsContext();
-        gc.makeCurrent();
-        OpenGL.init(gc);
         secondWindow.show();
 
         while (!secondWindow.shouldClose()) {
             secondWindow.pollEvents();
 
-            glClear(GL_COLOR_BUFFER_BIT);
-            glClearColor(1, 1, 1, 1);
+            gc.glClear(GL_COLOR_BUFFER_BIT);
+            gc.glClearColor(1, 1, 1, 1);
             secondWindow.swapBuffers();
         }
     }

@@ -10,12 +10,10 @@ final class Main {
     public static void main(String[] args) {
         Window window = Window.createWindowed("Todo GUI", 1080, 720);
         GraphicsContext context = window.createGraphicsContext();
-        context.makeCurrent();
-        OpenGL.init(context);
 
         TodoGUI gui = new TodoGUI();
         gui.layout.layout(gui);
-        ComponentRenderer renderer = new ComponentRenderer(Matrix4f.ortho(0, window.width(), 0, window.height(), -1, 1));
+        ComponentRenderer renderer = new ComponentRenderer(Matrix4f.ortho(0, window.width(), 0, window.height(), -1, 1), context);
 
         window.show();
 

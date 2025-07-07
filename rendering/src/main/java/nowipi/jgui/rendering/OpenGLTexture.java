@@ -1,36 +1,50 @@
 package nowipi.jgui.rendering;
 
+import nowipi.opengl.GraphicsContext;
 import nowipi.opengl.OpenGL;
 
+import java.lang.foreign.Arena;
+import java.lang.foreign.MemorySegment;
+import java.lang.foreign.ValueLayout;
+
 public final class OpenGLTexture {
+
+    private final GraphicsContext gc;
 
     private final int id;
     public final int width;
     public final int height;
     public final byte[] data;
 
-    public OpenGLTexture(int width, int height, byte[] data) {
+    public OpenGLTexture(int width, int height, byte[] data, GraphicsContext gc) {
+        this.gc = gc;
         this.width = width;
         this.height = height;
         this.data = data;
-        id = OpenGL.glGenTextures();
+        try(var arena = Arena.ofConfined()) {
+            MemorySegment idPointer = arena.allocateFrom(ValueLayout.JAVA_INT, 0);
+            gc.glGenTextures(1, idPointer);
+            id = idPointer.get(ValueLayout.JAVA_INT, 0);
 
-        bind();
-        OpenGL.glTexImage2D(OpenGL.GL_TEXTURE_2D, 0, OpenGL.GL_RGBA, width, height, 0, OpenGL.GL_RGBA, OpenGL.GL_UNSIGNED_BYTE, data);
+            bind();
+            gc.glTexImage2D(OpenGL.GL_TEXTURE_2D, 0, OpenGL.GL_RGBA, width, height, 0, OpenGL.GL_RGBA, OpenGL.GL_UNSIGNED_BYTE, MemorySegment.ofArray(data));
+        }
+
+
         // set Texture wrap and filter modes
-        OpenGL.glTexParameteri(OpenGL.GL_TEXTURE_2D, OpenGL.GL_TEXTURE_WRAP_S, OpenGL.GL_REPEAT);
-        OpenGL.glTexParameteri(OpenGL.GL_TEXTURE_2D, OpenGL.GL_TEXTURE_WRAP_T, OpenGL.GL_REPEAT);
-        OpenGL.glTexParameteri(OpenGL.GL_TEXTURE_2D, OpenGL.GL_TEXTURE_MIN_FILTER, OpenGL.GL_LINEAR);
-        OpenGL.glTexParameteri(OpenGL.GL_TEXTURE_2D, OpenGL.GL_TEXTURE_MAG_FILTER, OpenGL.GL_LINEAR);
+        gc.glTexParameteri(OpenGL.GL_TEXTURE_2D, OpenGL.GL_TEXTURE_WRAP_S, OpenGL.GL_REPEAT);
+        gc.glTexParameteri(OpenGL.GL_TEXTURE_2D, OpenGL.GL_TEXTURE_WRAP_T, OpenGL.GL_REPEAT);
+        gc.glTexParameteri(OpenGL.GL_TEXTURE_2D, OpenGL.GL_TEXTURE_MIN_FILTER, OpenGL.GL_LINEAR);
+        gc.glTexParameteri(OpenGL.GL_TEXTURE_2D, OpenGL.GL_TEXTURE_MAG_FILTER, OpenGL.GL_LINEAR);
 
-        unbind();
+        unbind(gc);
     }
 
     public void bind() {
-        OpenGL.glBindTexture(OpenGL.GL_TEXTURE_2D, id);
+        gc.glBindTexture(OpenGL.GL_TEXTURE_2D, id);
     }
 
-    public static void unbind() {
-        OpenGL.glBindTexture(OpenGL.GL_TEXTURE_2D, 0);
+    public static void unbind(GraphicsContext gc) {
+        gc.glBindTexture(OpenGL.GL_TEXTURE_2D, 0);
     }
 }

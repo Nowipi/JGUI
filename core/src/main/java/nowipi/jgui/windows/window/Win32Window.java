@@ -13,7 +13,7 @@ import nowipi.jgui.windows.ffm.gdi.PIXELFORMATDESCRIPTOR;
 import nowipi.jgui.windows.ffm.user32.MSG;
 import nowipi.jgui.windows.ffm.user32.User32;
 import nowipi.jgui.windows.ffm.user32.WNDCLASSW;
-import nowipi.jgui.windows.wgl.WGLGraphicsContext;
+import nowipi.opengl.win32.WGLGraphicsContextExtensionImpl;
 
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
@@ -132,7 +132,7 @@ public class Win32Window extends MapEventDispatcher implements Window {
 
     @Override
     public GraphicsContext createGraphicsContext() {
-        return new WGLGraphicsContext(hDC);
+        return new WGLGraphicsContextExtensionImpl(hDC);
     }
 
     @Override
