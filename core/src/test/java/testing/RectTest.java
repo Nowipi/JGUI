@@ -1,9 +1,10 @@
 package testing;
 
 import nowipi.jgui.rendering.BatchedQuadRenderer;
-import nowipi.opengl.GraphicsContext;
+import nowipi.jgui.rendering.OpenGL;
 import nowipi.jgui.window.Window;
 import nowipi.jgui.window.event.WindowResizeEvent;
+import nowipi.opengl.OpenGLGraphicsContext;
 import nowipi.primitives.Matrix4f;
 import nowipi.primitives.Rectangle;
 import nowipi.primitives.Vector2f;
@@ -14,7 +15,7 @@ final class RectTest {
 
     private final Window window;
     private BatchedQuadRenderer renderer;
-    private GraphicsContext gc;
+    private OpenGLGraphicsContext gc;
 
     public RectTest() {
         window = Window.createWindowed("Rect test window", 1080, 720);
@@ -22,7 +23,7 @@ final class RectTest {
 
     public void run() {
 
-        gc = window.createGraphicsContext();
+        gc = OpenGL.createGraphicsContext(window);
 
         gc.glEnable(GL_BLEND);
         gc.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

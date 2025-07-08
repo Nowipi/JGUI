@@ -1,7 +1,6 @@
 package nowipi.jgui.window;
 
 import nowipi.jgui.windows.window.Win32WindowProvider;
-import nowipi.opengl.GraphicsContext;
 import nowipi.jgui.window.event.EventDispatcher;
 
 public interface Window extends Disposable, EventDispatcher {
@@ -10,7 +9,6 @@ public interface Window extends Disposable, EventDispatcher {
     boolean shouldClose();
     void pollEvents();
     void swapBuffers();
-    GraphicsContext createGraphicsContext();
     void setPixelFormat(PixelFormat format);
     String title();
     int width();

@@ -1,15 +1,16 @@
 package testing.todo;
 
 import nowipi.jgui.components.Component;
+import nowipi.jgui.rendering.OpenGL;
 import nowipi.jgui.window.Window;
 import nowipi.opengl.GraphicsContext;
-import nowipi.opengl.OpenGL;
+import nowipi.opengl.OpenGLGraphicsContext;
 import nowipi.primitives.Matrix4f;
 
 final class Main {
     public static void main(String[] args) {
         Window window = Window.createWindowed("Todo GUI", 1080, 720);
-        GraphicsContext context = window.createGraphicsContext();
+        OpenGLGraphicsContext context = OpenGL.createGraphicsContext(window);
 
         TodoGUI gui = new TodoGUI();
         gui.layout.layout(gui);

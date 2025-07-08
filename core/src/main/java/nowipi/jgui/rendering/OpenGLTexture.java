@@ -1,7 +1,7 @@
 package nowipi.jgui.rendering;
 
-import nowipi.opengl.GraphicsContext;
 import nowipi.opengl.OpenGL;
+import nowipi.opengl.OpenGLGraphicsContext;
 
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
@@ -9,14 +9,14 @@ import java.lang.foreign.ValueLayout;
 
 public final class OpenGLTexture {
 
-    private final GraphicsContext gc;
+    private final OpenGLGraphicsContext gc;
 
     private final int id;
     public final int width;
     public final int height;
     public final byte[] data;
 
-    public OpenGLTexture(int width, int height, byte[] data, GraphicsContext gc) {
+    public OpenGLTexture(int width, int height, byte[] data, OpenGLGraphicsContext gc) {
         this.gc = gc;
         this.width = width;
         this.height = height;
@@ -44,7 +44,7 @@ public final class OpenGLTexture {
         gc.glBindTexture(OpenGL.GL_TEXTURE_2D, id);
     }
 
-    public static void unbind(GraphicsContext gc) {
+    public static void unbind(OpenGLGraphicsContext gc) {
         gc.glBindTexture(OpenGL.GL_TEXTURE_2D, 0);
     }
 }

@@ -8,6 +8,7 @@ import java.util.Map;
 
 import nowipi.opengl.GraphicsContext;
 import nowipi.opengl.OpenGL;
+import nowipi.opengl.OpenGLGraphicsContext;
 import nowipi.primitives.Axis;
 import nowipi.primitives.Matrix4f;
 
@@ -29,9 +30,9 @@ public final class TextureRenderer implements Renderer {
     };
 
     private final int quadVAO;
-    private final GraphicsContext gc;
+    private final OpenGLGraphicsContext gc;
 
-    public TextureRenderer(Matrix4f projection, GraphicsContext gc) {
+    public TextureRenderer(Matrix4f projection, OpenGLGraphicsContext gc) {
         this.gc = gc;
         try(var arena = Arena.ofConfined()) {
 

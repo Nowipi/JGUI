@@ -10,7 +10,6 @@
     <packaging>pom</packaging>
     <modules>
         <module>core</module>
-        <module>rendering</module>
         <module>components</module>
     </modules>
 

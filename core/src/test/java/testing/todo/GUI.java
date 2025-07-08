@@ -6,14 +6,15 @@ import nowipi.jgui.components.styling.Color;
 import nowipi.jgui.components.styling.ContainerLayout;
 import nowipi.jgui.components.styling.Grow;
 import nowipi.jgui.components.styling.Styling;
+import nowipi.jgui.rendering.OpenGL;
 import nowipi.jgui.window.Window;
-import nowipi.opengl.GraphicsContext;
+import nowipi.opengl.OpenGLGraphicsContext;
 
 final class GUI {
 
     public static void main(String[] args) {
         Window window = Window.createWindowed("Window title", 1080, 720);
-        GraphicsContext gc = window.createGraphicsContext();
+        OpenGLGraphicsContext gc = OpenGL.createGraphicsContext(window);
 
         window.show();
 

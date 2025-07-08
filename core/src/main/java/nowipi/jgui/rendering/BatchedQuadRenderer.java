@@ -1,13 +1,10 @@
 package nowipi.jgui.rendering;
 
-import nowipi.opengl.GraphicsContext;
-import nowipi.opengl.OpenGL;
+import nowipi.opengl.OpenGLGraphicsContext;
 import nowipi.primitives.Matrix4f;
 import nowipi.primitives.Quad;
 
-import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
-import java.lang.foreign.ValueLayout;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,13 +17,13 @@ public final class BatchedQuadRenderer implements Renderer {
 
     private record QuadDrawCommand(Quad quad, float r, float g, float b, float a) {}
 
-    private final GraphicsContext gc;
+    private final OpenGLGraphicsContext gc;
     private final int VAO;
     private final int VBO;
     private final int EBO;
     private final List<QuadDrawCommand> quads;
 
-    public BatchedQuadRenderer(Matrix4f projectionMatrix, GraphicsContext gc) {
+    public BatchedQuadRenderer(Matrix4f projectionMatrix, OpenGLGraphicsContext gc) {
 
         int vertexShader = gc.glCreateShader(OpenGL.GL_VERTEX_SHADER);
         String source = """
@@ -43,55 +40,47 @@ public final class BatchedQuadRenderer implements Renderer {
                     fColor = vColor / 255.0f;
                     gl_Position = projection * vec4(vPosition, 0.0, 1.0);
                 }""";
-        try(var arena = Arena.ofConfined()) {
-            gc.glShaderSource(vertexShader, 1, arena.allocateFrom(source), arena.allocateFrom(ValueLayout.JAVA_INT, source.length()));
+        OpenGL.glShaderSource(gc, vertexShader, source);
 
-            gc.glCompileShader(vertexShader);
+        gc.glCompileShader(vertexShader);
 
-            int fragmentShader = gc.glCreateShader(OpenGL.GL_FRAGMENT_SHADER);
-            source = """
-                    #version 330 core
-                    in vec4 fColor;
-                    out vec4 color;
-                    
-                    void main()
-                    {
-                        if(fColor.a < 0.1)
-                            discard;
-                        color = fColor;
-                    }""";
-            gc.glShaderSource(vertexShader, 1, arena.allocateFrom(source), arena.allocateFrom(ValueLayout.JAVA_INT, source.length()));
-            gc.glCompileShader(fragmentShader);
+        int fragmentShader = gc.glCreateShader(OpenGL.GL_FRAGMENT_SHADER);
+        source = """
+                #version 330 core
+                in vec4 fColor;
+                out vec4 color;
+                
+                void main()
+                {
+                    if(fColor.a < 0.1)
+                        discard;
+                    color = fColor;
+                }""";
+        OpenGL.glShaderSource(gc, fragmentShader, source);
+        gc.glCompileShader(fragmentShader);
 
-            shader = gc.glCreateProgram();
-            gc.glAttachShader(shader, vertexShader);
-            gc.glAttachShader(shader, fragmentShader);
+        shader = gc.glCreateProgram();
+        gc.glAttachShader(shader, vertexShader);
+        gc.glAttachShader(shader, fragmentShader);
 
-            gc.glLinkProgram(shader);
-            gc.glDeleteShader(vertexShader);
-            gc.glDeleteShader(fragmentShader);
+        gc.glLinkProgram(shader);
+        gc.glDeleteShader(vertexShader);
+        gc.glDeleteShader(fragmentShader);
 
 
-            projectionUniformLocation = gc.glGetUniformLocation(shader, arena.allocateFrom("projection"));
+        projectionUniformLocation = OpenGL.glGetUniformLocation(gc, shader, "projection");
 
-            this.gc = gc;
+        this.gc = gc;
 
-            quads = new ArrayList<>(10);
+        quads = new ArrayList<>(10);
 
-            setProjection(projectionMatrix);
+        setProjection(projectionMatrix);
 
-            MemorySegment VAOP = arena.allocateFrom(ValueLayout.JAVA_INT);
-            gc.glGenVertexArrays(1, VAOP);
-            VAO = VAOP.get(ValueLayout.JAVA_INT, 0);
-            gc.glBindVertexArray(VAO);
+        VAO = OpenGL.glGenVertexArray(gc);
+        gc.glBindVertexArray(VAO);
 
-            MemorySegment VBOP = arena.allocateFrom(ValueLayout.JAVA_INT);
-            gc.glGenBuffers(1, VBOP);
-            VBO = VBOP.get(ValueLayout.JAVA_INT, 0);
-            MemorySegment EBOP = arena.allocateFrom(ValueLayout.JAVA_INT);
-            gc.glGenBuffers(1, EBOP);
-            EBO = EBOP.get(ValueLayout.JAVA_INT, 0);
-        }
+        VBO = OpenGL.glGenBuffer(gc);
+        EBO = OpenGL.glGenBuffer(gc);
         gc.glBindBuffer(GL_ARRAY_BUFFER, VBO);
         gc.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
         gc.glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 6 * Float.BYTES, 0);
@@ -173,11 +162,11 @@ public final class BatchedQuadRenderer implements Renderer {
 
 
         gc.glBindVertexArray(VAO);
-        gc.glBindBuffer(OpenGL.GL_ARRAY_BUFFER, VBO);
-        gc.glBufferData(GL_ARRAY_BUFFER, vertexData.length, MemorySegment.ofArray(vertexData), GL_DYNAMIC_DRAW);
+        gc.glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        OpenGL.glBufferData(gc, GL_ARRAY_BUFFER, vertexData, GL_DYNAMIC_DRAW);
 
-        gc.glBindBuffer(OpenGL.GL_ELEMENT_ARRAY_BUFFER, EBO);
-        gc.glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexData.length, MemorySegment.ofArray(indexData), GL_DYNAMIC_DRAW);
+        gc.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+        OpenGL.glBufferData(gc, GL_ELEMENT_ARRAY_BUFFER, indexData, GL_DYNAMIC_DRAW);
 
         gc.glUseProgram(shader);
         gc.glDrawElements(GL_TRIANGLES, 6 * rectangleCount, GL_UNSIGNED_INT, MemorySegment.ofAddress(0));
@@ -185,6 +174,6 @@ public final class BatchedQuadRenderer implements Renderer {
 
     public void setProjection(Matrix4f projection) {
         gc.glUseProgram(shader);
-        gc.glUniformMatrix4fv(projectionUniformLocation, 1, GL_FALSE, MemorySegment.ofArray(projection.toArray()));
+        OpenGL.glUniformMatrix4fv(gc, projectionUniformLocation, false, projection.toArray());
     }
 }

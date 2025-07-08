@@ -1,5 +1,6 @@
 package testing;
 
+import nowipi.jgui.rendering.OpenGL;
 import nowipi.jgui.window.Window;
 
 import static nowipi.opengl.OpenGL.*;
@@ -9,7 +10,7 @@ final class WindowChangeTest {
     public static void main(String[] args) {
         Window firstWindow = Window.createWindowed("Bruh", 1080 , 720);
 
-        var gc = firstWindow.createGraphicsContext();
+        var gc = OpenGL.createGraphicsContext(firstWindow);
 
         firstWindow.show();
 
@@ -28,7 +29,7 @@ final class WindowChangeTest {
 
         firstWindow.close();
 
-        gc = secondWindow.createGraphicsContext();
+        gc = OpenGL.createGraphicsContext(secondWindow);
         secondWindow.show();
 
         while (!secondWindow.shouldClose()) {

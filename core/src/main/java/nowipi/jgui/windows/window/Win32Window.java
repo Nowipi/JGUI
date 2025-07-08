@@ -3,7 +3,6 @@ package nowipi.jgui.windows.window;
 import nowipi.jgui.window.event.WindowResizeEvent;
 import nowipi.jgui.windows.ffm.gdi.GDI32Impl;
 import nowipi.jgui.windows.ffm.user32.User32Impl;
-import nowipi.opengl.GraphicsContext;
 import nowipi.jgui.window.PixelFormat;
 import nowipi.jgui.window.Window;
 import nowipi.jgui.window.event.MapEventDispatcher;
@@ -13,7 +12,6 @@ import nowipi.jgui.windows.ffm.gdi.PIXELFORMATDESCRIPTOR;
 import nowipi.jgui.windows.ffm.user32.MSG;
 import nowipi.jgui.windows.ffm.user32.User32;
 import nowipi.jgui.windows.ffm.user32.WNDCLASSW;
-import nowipi.opengl.win32.WGLGraphicsContextExtensionImpl;
 
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
@@ -131,11 +129,6 @@ public class Win32Window extends MapEventDispatcher implements Window {
     }
 
     @Override
-    public GraphicsContext createGraphicsContext() {
-        return new WGLGraphicsContextExtensionImpl(hDC);
-    }
-
-    @Override
     public void setPixelFormat(PixelFormat format) {
         try(Arena arena = Arena.ofConfined()) {
             MemorySegment pfd = PIXELFORMATDESCRIPTOR.allocate(arena);
@@ -186,6 +179,10 @@ public class Win32Window extends MapEventDispatcher implements Window {
     @Override
     public int y() {
         return y;
+    }
+
+    public MemorySegment deviceContext() {
+        return hDC;
     }
 
     @Override

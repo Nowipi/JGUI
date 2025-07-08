@@ -4,6 +4,7 @@ import nowipi.jgui.rendering.BatchedQuadRenderer;
 import nowipi.jgui.rendering.Renderer;
 import nowipi.jgui.rendering.TextureRenderer;
 import nowipi.opengl.GraphicsContext;
+import nowipi.opengl.OpenGLGraphicsContext;
 import nowipi.primitives.Matrix4f;
 import nowipi.primitives.Rectangle;
 
@@ -13,7 +14,7 @@ final class ComponentRenderer implements Renderer {
     //private final TextRenderer textRenderer;
     private final TextureRenderer textureRenderer;
 
-    public ComponentRenderer(Matrix4f projection, GraphicsContext gc) {
+    public ComponentRenderer(Matrix4f projection, OpenGLGraphicsContext gc) {
         rectangleRenderer = new BatchedQuadRenderer(projection, gc);
         //textRenderer = new TextRenderer();
         textureRenderer = new TextureRenderer(projection, gc);
