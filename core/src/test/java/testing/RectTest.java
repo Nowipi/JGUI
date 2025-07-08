@@ -15,16 +15,14 @@ final class RectTest {
 
     private final Window window;
     private BatchedQuadRenderer renderer;
-    private OpenGLGraphicsContext gc;
+    private final OpenGLGraphicsContext gc;
 
     public RectTest() {
         window = Window.createWindowed("Rect test window", 1080, 720);
+        gc = OpenGL.createGraphicsContext(window, 3, 2, OpenGL.Profile.CORE);
     }
 
     public void run() {
-
-        gc = OpenGL.createGraphicsContext(window);
-
         gc.glEnable(GL_BLEND);
         gc.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -46,12 +44,7 @@ final class RectTest {
         renderFrame();
     }
 
-    long lastTime = System.nanoTime();
     private void renderFrame() {
-        long current = System.nanoTime();
-        float delta = (current - lastTime) / 1_000_000_000f;
-        lastTime = current;
-
         gc.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         gc.glClearColor(1, 1, 1, 1);
         renderer.beginFrame();
