@@ -3,6 +3,7 @@ package nowipi.jgui.rendering;
 import nowipi.opengl.OpenGLGraphicsContext;
 import nowipi.primitives.Matrix4f;
 import nowipi.primitives.Quad;
+import nowipi.primitives.Vector2f;
 
 import java.lang.foreign.MemorySegment;
 import java.util.ArrayList;
@@ -121,34 +122,15 @@ public final class BatchedQuadRenderer implements Renderer {
         int indexDataIndex = 0;
         for (int i = 0; i < quads.size(); i++) {
             var command = quads.get(i);
-            var quad = command.quad;
-            vertexData[vertexDataIndex++] = quad.topLeft.x;
-            vertexData[vertexDataIndex++] = quad.topLeft.y;
-            vertexData[vertexDataIndex++] = command.r();
-            vertexData[vertexDataIndex++] = command.g();
-            vertexData[vertexDataIndex++] = command.b();
-            vertexData[vertexDataIndex++] = command.a();
 
-            vertexData[vertexDataIndex++] = quad.topRight.x;
-            vertexData[vertexDataIndex++] = quad.topRight.y;
-            vertexData[vertexDataIndex++] = command.r();
-            vertexData[vertexDataIndex++] = command.g();
-            vertexData[vertexDataIndex++] = command.b();
-            vertexData[vertexDataIndex++] = command.a();
-
-            vertexData[vertexDataIndex++] = quad.bottomRight.x;
-            vertexData[vertexDataIndex++] = quad.bottomRight.y;
-            vertexData[vertexDataIndex++] = command.r();
-            vertexData[vertexDataIndex++] = command.g();
-            vertexData[vertexDataIndex++] = command.b();
-            vertexData[vertexDataIndex++] = command.a();
-
-            vertexData[vertexDataIndex++] = quad.bottomLeft.x;
-            vertexData[vertexDataIndex++] = quad.bottomLeft.y;
-            vertexData[vertexDataIndex++] = command.r();
-            vertexData[vertexDataIndex++] = command.g();
-            vertexData[vertexDataIndex++] = command.b();
-            vertexData[vertexDataIndex++] = command.a();
+            for (Vector2f vertex : command.quad.vertices()) {
+                vertexData[vertexDataIndex++] = vertex.x;
+                vertexData[vertexDataIndex++] = vertex.y;
+                vertexData[vertexDataIndex++] = command.r();
+                vertexData[vertexDataIndex++] = command.g();
+                vertexData[vertexDataIndex++] = command.b();
+                vertexData[vertexDataIndex++] = command.a();
+            }
 
             int vertexBase = i * 4;
             indexData[indexDataIndex++] = vertexBase + 0;

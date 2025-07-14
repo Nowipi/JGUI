@@ -48,6 +48,19 @@ public interface User32 {
     int WM_SIZING = 0x0214;
     int WM_ENTERSIZEMOVE = 0x0231;
     int WM_EXITSIZEMOVE  = 0x0232;
+    int WH_MOUSE_LL = 14;
+    int WM_MOUSEMOVE = 0x0200;
+    int WM_LBUTTONDOWN = 0x0201;
+    int WM_LBUTTONUP = 0x0202;
+    int WM_RBUTTONDOWN = 0x0204;
+    int WM_RBUTTONUP = 0x0205;
+    int WM_MBUTTONDOWN = 0x0207;
+    int WM_MBUTTONUP = 0x0208;
+    int WM_XBUTTONDOWN = 0x020B;
+    int WM_XBUTTONUP = 0x020C;
+
+    int MK_XBUTTON1 = 0x0020;
+    int MK_XBUTTON2 = 0x0040;
 
     int CS_HREDRAW = 0x001;
     int CS_VREDRAW = 0x002;
@@ -63,26 +76,26 @@ public interface User32 {
     int WS_EX_NOPARENTNOTIFY = 0x00000004;
 
     @Function("RegisterClassW")
-    short registerClassW(MemorySegment wndClass);
+    short registerClass(MemorySegment wndClass);
 
     @Function("CreateWindowExW")
-    MemorySegment createWindowExW(int dwExStyle, MemorySegment lpClassName, MemorySegment lpWindowName, int dwStyle, int X, int Y, int nWidth, int nHeight, MemorySegment hWndParent,
-                                                MemorySegment hMenu, MemorySegment hInstance, MemorySegment lpParam);
+    MemorySegment createWindowEx(int dwExStyle, MemorySegment lpClassName, MemorySegment lpWindowName, int dwStyle, int X, int Y, int nWidth, int nHeight, MemorySegment hWndParent,
+                                 MemorySegment hMenu, MemorySegment hInstance, MemorySegment lpParam);
 
     @Function("ShowWindow")
     int showWindow(MemorySegment hWnd, int nCmdShow);
 
     @Function("PeekMessageW")
-    int peekMessageW(MemorySegment lpMsg, MemorySegment hWnd, int wMsgFilterMin, int wMsgFilterMax, int wRemoveMsg);
+    int peekMessage(MemorySegment lpMsg, MemorySegment hWnd, int wMsgFilterMin, int wMsgFilterMax, int wRemoveMsg);
 
     @Function("TranslateMessage")
     int translateMessage(MemorySegment lpMsg);
 
     @Function("DispatchMessageW")
-    long dispatchMessageW(MemorySegment lpMsg);
+    long dispatchMessage(MemorySegment lpMsg);
 
     @Function("DefWindowProcW")
-    long defWindowProcW(MemorySegment hWnd, int Msg, long wParam, long lParam);
+    long defWindowProc(MemorySegment hWnd, int Msg, long wParam, long lParam);
 
     @Function("IsWindowVisible")
     boolean isWindowVisible(MemorySegment hWnd);
@@ -106,5 +119,11 @@ public interface User32 {
     void setWindowPos(MemorySegment hWnd, MemorySegment hWndInsertAfter, int X, int Y, int cx, int cy, int uFlags);
 
     @Function("GetWindowTextW")
-    int getWindowTextW(MemorySegment hWnd, MemorySegment lpString, int nMaxCount);
+    int getWindowText(MemorySegment hWnd, MemorySegment lpString, int nMaxCount);
+
+    @Function("SetWindowsHookExW")
+    MemorySegment setWindowsHookEx(int idHook, MemorySegment lpfn, MemorySegment hmod, int dwThreadId);
+
+    @Function("CallNextHookEx")
+    MemorySegment callNextHookEx(MemorySegment hhk, int nCode, long wParam, long lParam);
 }

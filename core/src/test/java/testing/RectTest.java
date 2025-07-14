@@ -3,7 +3,6 @@ package testing;
 import nowipi.jgui.rendering.BatchedQuadRenderer;
 import nowipi.jgui.rendering.OpenGL;
 import nowipi.jgui.window.Window;
-import nowipi.jgui.window.event.WindowResizeEvent;
 import nowipi.opengl.OpenGLGraphicsContext;
 import nowipi.primitives.Matrix4f;
 import nowipi.primitives.Rectangle;
@@ -26,9 +25,9 @@ final class RectTest {
         gc.glEnable(GL_BLEND);
         gc.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        renderer = new BatchedQuadRenderer(Matrix4f.ortho(0, window.width(), 0, window.height(), -1, 1), gc);
+        renderer = new BatchedQuadRenderer(Matrix4f.ortho(0, window.width(), window.height(), 0, -1, 1), gc);
 
-        window.addListener(WindowResizeEvent.class, event -> onResizeWindow(event.width(), event.height()));
+        window.addListener(this::onResizeWindow);
 
         window.show();
 

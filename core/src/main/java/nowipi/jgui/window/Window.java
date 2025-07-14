@@ -1,9 +1,10 @@
 package nowipi.jgui.window;
 
+import nowipi.jgui.window.event.WindowEventListener;
 import nowipi.jgui.windows.window.Win32WindowProvider;
-import nowipi.jgui.window.event.EventDispatcher;
+import nowipi.jgui.event.EventDispatcher;
 
-public interface Window extends Disposable, EventDispatcher {
+public interface Window extends Disposable, EventDispatcher<WindowEventListener> {
 
     void show();
     boolean shouldClose();

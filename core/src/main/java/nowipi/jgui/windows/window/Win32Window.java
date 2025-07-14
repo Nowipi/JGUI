@@ -1,11 +1,11 @@
 package nowipi.jgui.windows.window;
 
-import nowipi.jgui.window.event.WindowResizeEvent;
+import nowipi.jgui.window.event.WindowEventListener;
 import nowipi.jgui.windows.ffm.gdi.GDI32Impl;
 import nowipi.jgui.windows.ffm.user32.User32Impl;
 import nowipi.jgui.window.PixelFormat;
 import nowipi.jgui.window.Window;
-import nowipi.jgui.window.event.MapEventDispatcher;
+import nowipi.jgui.event.ArrayListEventDispatcher;
 import nowipi.jgui.windows.ffm.Win32;
 import nowipi.jgui.windows.ffm.gdi.GDI32;
 import nowipi.jgui.windows.ffm.gdi.PIXELFORMATDESCRIPTOR;
@@ -19,7 +19,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Win32Window extends MapEventDispatcher implements Window {
+public class Win32Window extends ArrayListEventDispatcher<WindowEventListener> implements Window {
 
     private static final MemorySegment CLASS_NAME;
     private static final Arena arena;
@@ -39,7 +39,7 @@ public class Win32Window extends MapEventDispatcher implements Window {
         WNDCLASSW.setStyle(wc, User32.CS_HREDRAW | User32.CS_VREDRAW | User32.CS_OWNDC);
 
 
-        user32.registerClassW(wc);
+        user32.registerClass(wc);
         windows = new HashMap<>();
     }
 
@@ -52,7 +52,7 @@ public class Win32Window extends MapEventDispatcher implements Window {
                     int height = Win32.hiWord(lParam);
                     window.width = width;
                     window.height = height;
-                    window.dispatch(WindowResizeEvent.class, new WindowResizeEvent(width, height));
+                    window.dispatch(l -> l.resize(width, height));
                     return 0;
                 }
                 case User32.WM_MOVE -> {
@@ -67,7 +67,7 @@ public class Win32Window extends MapEventDispatcher implements Window {
                 }
             }
         }
-        return user32.defWindowProcW(hwnd, uMsg, wParam, lParam);
+        return user32.defWindowProc(hwnd, uMsg, wParam, lParam);
     }
 
     private final MemorySegment hWnd;
@@ -85,7 +85,7 @@ public class Win32Window extends MapEventDispatcher implements Window {
     protected Win32Window(String title, int width, int height, int style) {
         this.width = width;
         this.height = height;
-        this.hWnd = user32.createWindowExW(
+        this.hWnd = user32.createWindowEx(
                 0,
                 CLASS_NAME,
                 arena.allocateFrom(title, StandardCharsets.UTF_16LE),
@@ -116,9 +116,9 @@ public class Win32Window extends MapEventDispatcher implements Window {
     public void pollEvents() {
         try(Arena arena = Arena.ofConfined()) {
             MemorySegment msg = MSG.allocate(arena);
-            while (user32.peekMessageW(msg, hWnd, 0, 0, User32.PM_REMOVE) > 0) {
+            while (user32.peekMessage(msg, hWnd, 0, 0, User32.PM_REMOVE) > 0) {
                 user32.translateMessage(msg);
-                user32.dispatchMessageW(msg);
+                user32.dispatchMessage(msg);
             }
         }
     }
@@ -150,7 +150,7 @@ public class Win32Window extends MapEventDispatcher implements Window {
         try(Arena arena = Arena.ofConfined()) {
             int bufferSize = 512;
             MemorySegment buffer = arena.allocate(bufferSize * 2);
-            user32.getWindowTextW(hWnd, buffer, bufferSize);
+            user32.getWindowText(hWnd, buffer, bufferSize);
 
             return buffer.getString(0, StandardCharsets.UTF_16LE);
         }

@@ -1,33 +1,38 @@
 package testing.todo;
 
-import nowipi.jgui.components.Component;
+import nowipi.jgui.rendering.ComponentRenderer;
 import nowipi.jgui.rendering.OpenGL;
 import nowipi.jgui.window.Window;
-import nowipi.opengl.GraphicsContext;
 import nowipi.opengl.OpenGLGraphicsContext;
 import nowipi.primitives.Matrix4f;
 
 final class Main {
     public static void main(String[] args) {
-        Window window = Window.createWindowed("Todo GUI", 1080, 720);
-        OpenGLGraphicsContext context = OpenGL.createGraphicsContext(window);
+        Window window = Window.createBorderless("Todo GUI", 1080, 720);
+        OpenGLGraphicsContext gc = OpenGL.createGraphicsContext(window, 3, 2, OpenGL.Profile.CORE);
 
-        TodoGUI gui = new TodoGUI();
-        gui.layout.layout(gui);
-        ComponentRenderer renderer = new ComponentRenderer(Matrix4f.ortho(0, window.width(), 0, window.height(), -1, 1), context);
+        Todo todo = new Todo();
+        todo.items().addItem(new Item("Rendering"));
+
+        TodoLook todoView = new TodoLook(todo);
+
+        TodoInteraction todoInteraction = new TodoInteraction(todo);
+
+        ComponentRenderer renderer = new ComponentRenderer(Matrix4f.ortho(0, window.width(), window.height(), 0, -1, 1), gc);
 
         window.show();
 
         while (!window.shouldClose()) {
             window.pollEvents();
 
-            //renderer.renderComponent(gui);
+            gc.glClear(OpenGL.GL_COLOR_BUFFER_BIT | OpenGL.GL_DEPTH_BUFFER_BIT);
+            gc.glClearColor(1, 0, 1, 1);
+
+            renderer.beginFrame();
+            renderer.drawComponent(todoView);
+            renderer.endFrame();
 
             window.swapBuffers();
         }
-    }
-
-    private void renderComponent(Component component) {
-
     }
 }

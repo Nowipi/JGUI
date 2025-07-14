@@ -2,7 +2,6 @@ package testing;
 
 import nowipi.jgui.rendering.OpenGL;
 import nowipi.jgui.window.Window;
-import nowipi.jgui.window.event.WindowResizeEvent;
 import nowipi.opengl.OpenGLGraphicsContext;
 
 import java.lang.foreign.MemorySegment;
@@ -23,7 +22,7 @@ class HelloTriangle {
 
         OpenGLGraphicsContext gc = OpenGL.createGraphicsContext(window);
 
-        window.addListener(WindowResizeEvent.class, e -> gc.glViewport(0, 0, e.width(), e.height()));
+        window.addListener((width, height) -> gc.glViewport(0, 0, width, height));
 
 
         int vertexShader = gc.glCreateShader(GL_VERTEX_SHADER);
