@@ -1,33 +1,12 @@
 package nowipi.jgui.input.keyboard;
 
-import nowipi.jgui.event.ArrayListEventDispatcher;
+import nowipi.jgui.event.EventDispatcher;
 
-import java.util.HashSet;
-import java.util.Set;
+public interface Keyboard extends EventDispatcher<KeyboardEventListener> {
 
-public class Keyboard extends ArrayListEventDispatcher<KeyboardEventListener> {
+    void press(Key key);
+    void release(Key key);
 
-    private static final int INITIAL_CAPACITY_BASED_ON_ROLL_OVER = 6;
+    boolean isPressed(Key key);
 
-    private final Set<Key> pressedKeys;
-
-    public Keyboard() {
-        pressedKeys = new HashSet<>(INITIAL_CAPACITY_BASED_ON_ROLL_OVER);
-    }
-
-    public void press(Key key) {
-        if (pressedKeys.add(key)) {
-            dispatch(l -> l.press(key));
-        }
-    }
-
-    public boolean isPressed(Key key) {
-        return pressedKeys.contains(key);
-    }
-
-    public void release(Key key) {
-        if (pressedKeys.remove(key)) {
-            dispatch(l -> l.release(key));
-        }
-    }
 }

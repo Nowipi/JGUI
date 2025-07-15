@@ -31,7 +31,6 @@ final class MouseTest {
 
         while (!window.shouldClose()) {
             window.pollEvents();
-            System.out.println(mouse.x() + " " + mouse.y());
         }
 
         mouse.close();
@@ -39,17 +38,12 @@ final class MouseTest {
 
     private static void drawCircle(Mouse mouse, float centerX, float centerY, float radius) {
 
-
-        double startX = Math.sin(0) * radius + centerX;
-        double startY = Math.cos(0) * radius + centerY;
-
-
-        mouse.setPosition((int) startX, (int) startY);
+        mouse.setPosition((int) (radius + centerX), (int) centerY);
         mouse.press(Button.LEFT);
 
-        for(double t = Math.PI * 0.5; t <= Math.PI; t+=0.0001) {
-            double x = Math.sin(t) * radius + centerX;
-            double y = Math.cos(t) * radius + centerY;
+        for(double t = 0; t <= Math.PI; t += 0.0001) {
+            double x = Math.cos(t) * radius + centerX;
+            double y = Math.sin(t) * radius + centerY;
             mouse.setPosition((int) x, (int) y);
         }
         mouse.release(Button.LEFT);
@@ -63,7 +57,7 @@ final class MouseTest {
 
         drawLine(mouse, topLeftX + 200, topLeftY, topLeftX + 200, topLeftY - 100);
 
-        drawCircle(mouse, topLeftX + 100, topLeftY - 100, 50);
+        drawCircle(mouse, topLeftX + 100, topLeftY + 100, 100);
     }
 
     private static void drawLine(Mouse mouse, int fromX, int fromY, int toX, int toY) {
