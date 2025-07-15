@@ -25,7 +25,8 @@ final class RectTest {
         gc.glEnable(GL_BLEND);
         gc.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        renderer = new BatchedQuadRenderer(Matrix4f.ortho(0, window.width(), window.height(), 0, -1, 1), gc);
+        Rectangle windowBounds = window.bounds();
+        renderer = new BatchedQuadRenderer(Matrix4f.ortho(0, windowBounds.width(), windowBounds.height(), 0, -1, 1), gc);
 
         window.addListener(this::onResizeWindow);
 
@@ -39,7 +40,7 @@ final class RectTest {
 
     private void onResizeWindow(int windowWidth, int windowHeight) {
         gc.glViewport(0, 0, windowWidth, windowHeight);
-        renderer.setProjection(Matrix4f.ortho(0, window.width(), 0, window.height(), -1, 1));
+        renderer.setProjection(Matrix4f.ortho(0, windowWidth, 0, windowHeight, -1, 1));
         renderFrame();
     }
 
@@ -48,9 +49,11 @@ final class RectTest {
         gc.glClearColor(1, 1, 1, 1);
         renderer.beginFrame();
         renderer.drawQuad(new Rectangle(new Vector2f(100, 100), new Vector2f(135, 135), -50), 255, 0, 255, 100);
-        renderer.drawQuad(Rectangle.fromCenter(window.width()/2f, window.height()/2f, 100, 100), 255, 255, 0, 100);
 
-        renderer.drawQuad(Rectangle.fromTopLeft(window.width() - 100, 0, 100, -100), 0, 0, 255, 100);
+        Rectangle windowBounds = window.bounds();
+        renderer.drawQuad(Rectangle.fromCenter(windowBounds.width()/2f, windowBounds.height()/2f, 100, 100), 255, 255, 0, 100);
+
+        renderer.drawQuad(Rectangle.fromTopLeft(windowBounds.width() - 100, 0, 100, -100), 0, 0, 255, 100);
         renderer.endFrame();
         window.swapBuffers();
     }

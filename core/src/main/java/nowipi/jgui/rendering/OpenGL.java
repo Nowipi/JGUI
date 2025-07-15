@@ -27,7 +27,7 @@ public final class OpenGL extends nowipi.opengl.OpenGL {
     public static OpenGLGraphicsContext createGraphicsContext(Window window) {
         switch (window) {
             case Win32Window win32Window -> {
-                return new WGLGraphicsContextExtensionImpl(win32Window.deviceContext());
+                return new WGLGraphicsContextExtensionImpl(win32Window.deviceContext().handle());
             }
             default -> throw new IllegalStateException("Unexpected value: " + window);
         }
@@ -36,7 +36,7 @@ public final class OpenGL extends nowipi.opengl.OpenGL {
     public static OpenGLGraphicsContext createGraphicsContext(Window window, int majorVersion, int minorVersion, Profile profile) {
         switch (window) {
             case Win32Window win32Window -> {
-                WGLGraphicsContext gc =  new WGLGraphicsContextExtensionImpl(win32Window.deviceContext());
+                WGLGraphicsContext gc =  new WGLGraphicsContextExtensionImpl(win32Window.deviceContext().handle());
                 int profileMask = switch (profile) {
                     case CORE -> WGL_CONTEXT_CORE_PROFILE_BIT_ARB;
                     case COMPATIBILITY -> WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB;

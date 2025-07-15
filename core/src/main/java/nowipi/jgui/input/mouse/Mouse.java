@@ -1,59 +1,30 @@
 package nowipi.jgui.input.mouse;
 
-import nowipi.jgui.event.ArrayListEventDispatcher;
+import nowipi.jgui.event.EventDispatcher;
 
-public class Mouse extends ArrayListEventDispatcher<MouseEventListener> {
+public interface Mouse extends EventDispatcher<MouseEventListener> {
 
-    private float x;
-    private float y;
-    private final boolean[] pressedButtons;
+    boolean isPressed(Button button);
 
-    public Mouse() {
-        pressedButtons = new boolean[Button.values().length];
-    }
+    int x();
+    int y();
 
-    public boolean isPressed(Button button) {
-        if (button == null)
-            throw new NullPointerException("button is null");
+    /**
+     * Changes the mouse position and dispatches a mouse move event.
+     * @param x new mouse x position.
+     * @param y new mouse y position.
+     */
+    void setPosition(int x, int y);
 
-        return pressedButtons[button.ordinal()];
-    }
+    /**
+     * Presses a button and dispatches a press event.
+     * @param button the mouse button to be pressed.
+     */
+    void press(Button button);
 
-    public float x() {
-        return x;
-    }
-
-    public float y() {
-        return y;
-    }
-
-    public void setPosition(float x, float y) {
-        boolean isSame = this.x == x && this.y == y;
-        this.x = x;
-        this.y = y;
-        if (!isSame) {
-            dispatch(l -> l.move(x, y));
-        }
-    }
-
-    public void press(Button button) {
-        if (button == null)
-            throw new NullPointerException("button is null");
-
-        if (!isPressed(button)) {
-            pressedButtons[button.ordinal()] = true;
-            dispatch(l -> l.press(button));
-        }
-
-    }
-
-    public void release(Button button) {
-        if (button == null)
-            throw new NullPointerException("button is null");
-
-        if (isPressed(button)) {
-            pressedButtons[button.ordinal()] = false;
-            dispatch(l -> l.release(button));
-        }
-    }
+    /**
+     * Releases a button and dispatches a release event.
+     * @param button the mouse button to be released.
+     */
+    void release(Button button);
 }

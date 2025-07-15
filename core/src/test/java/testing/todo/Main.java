@@ -5,6 +5,7 @@ import nowipi.jgui.rendering.OpenGL;
 import nowipi.jgui.window.Window;
 import nowipi.opengl.OpenGLGraphicsContext;
 import nowipi.primitives.Matrix4f;
+import nowipi.primitives.Rectangle;
 
 final class Main {
     public static void main(String[] args) {
@@ -18,7 +19,8 @@ final class Main {
 
         TodoInteraction todoInteraction = new TodoInteraction(todo);
 
-        ComponentRenderer renderer = new ComponentRenderer(Matrix4f.ortho(0, window.width(), window.height(), 0, -1, 1), gc);
+        Rectangle windowBounds = window.bounds();
+        ComponentRenderer renderer = new ComponentRenderer(Matrix4f.ortho(0, windowBounds.width(), windowBounds.height(), 0, -1, 1), gc);
 
         window.show();
 

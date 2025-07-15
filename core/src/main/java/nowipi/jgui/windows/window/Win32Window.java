@@ -1,105 +1,69 @@
 package nowipi.jgui.windows.window;
 
 import nowipi.jgui.window.event.WindowEventListener;
-import nowipi.jgui.windows.ffm.gdi.GDI32Impl;
-import nowipi.jgui.windows.ffm.user32.User32Impl;
 import nowipi.jgui.window.PixelFormat;
 import nowipi.jgui.window.Window;
 import nowipi.jgui.event.ArrayListEventDispatcher;
-import nowipi.jgui.windows.ffm.Win32;
 import nowipi.jgui.windows.ffm.gdi.GDI32;
 import nowipi.jgui.windows.ffm.gdi.PIXELFORMATDESCRIPTOR;
 import nowipi.jgui.windows.ffm.user32.MSG;
+import nowipi.jgui.windows.ffm.user32.RECT;
 import nowipi.jgui.windows.ffm.user32.User32;
-import nowipi.jgui.windows.ffm.user32.WNDCLASSW;
+import nowipi.primitives.Rectangle;
 
-import java.lang.foreign.Arena;
-import java.lang.foreign.MemorySegment;
+import java.lang.foreign.*;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
+
+import static nowipi.jgui.windows.ffm.Win32.gdi32;
+import static nowipi.jgui.windows.ffm.Win32.user32;
 
 public class Win32Window extends ArrayListEventDispatcher<WindowEventListener> implements Window {
 
-    private static final MemorySegment CLASS_NAME;
-    private static final Arena arena;
-    private static final Map<MemorySegment, Win32Window> windows;
-    private static final User32 user32 = new User32Impl();
-    private static final GDI32 gdi32 = new GDI32Impl();
+    public class DeviceContext implements AutoCloseable {
 
-    static {
-        arena = Arena.ofAuto();
-        CLASS_NAME = arena.allocateFrom("JavaWindow", StandardCharsets.UTF_16LE);
-        MemorySegment wc = WNDCLASSW.allocate(arena);
-        WNDCLASSW.setLpszClassName(wc, CLASS_NAME);
+        private final MemorySegment hDC;
 
-        WNDCLASSW.setLpfnWndProc(wc, Win32Window::windowProc);
+        public DeviceContext() {
+            hDC = user32.getDC(hWnd);
+        }
 
-        WNDCLASSW.sethCursor(wc, user32.loadCursorA(MemorySegment.NULL, User32.IDC_ARROW));
-        WNDCLASSW.setStyle(wc, User32.CS_HREDRAW | User32.CS_VREDRAW | User32.CS_OWNDC);
+        public void swapBuffers() {
+            gdi32.swapBuffers(hDC);
+        }
 
+        public void setPixelFormat(PixelFormat format) {
+            try(Arena arena = Arena.ofConfined()) {
+                MemorySegment pfd = PIXELFORMATDESCRIPTOR.allocate(arena);
+                PIXELFORMATDESCRIPTOR.setNSize(pfd, (short) pfd.byteSize());
+                PIXELFORMATDESCRIPTOR.setNVersion(pfd, (short) 1);
+                PIXELFORMATDESCRIPTOR.setDwFlags(pfd, GDI32.PFD_DRAW_TO_WINDOW | GDI32.PFD_SUPPORT_OPENGL | GDI32.PFD_DOUBLEBUFFER);
+                PIXELFORMATDESCRIPTOR.setIPixelType(pfd, switch (format.colorSpace()) { case PixelFormat.ColorSpace.RGBA -> GDI32.PFD_TYPE_RGBA;});
+                PIXELFORMATDESCRIPTOR.setCColorBits(pfd, (byte) format.colorBits());
+                PIXELFORMATDESCRIPTOR.setILayerType(pfd, (byte) GDI32.PFD_MAIN_PLANE);
 
-        user32.registerClass(wc);
-        windows = new HashMap<>();
-    }
+                int pixelFormat = gdi32.choosePixelFormat(hDC, pfd);
 
-    private static long windowProc(MemorySegment hwnd, int uMsg, long wParam, long lParam) {
-        var window = windows.get(hwnd);
-        if (window != null) {
-            switch (uMsg) {
-                case User32.WM_SIZE -> {
-                    int width = Win32.loWord(lParam);
-                    int height = Win32.hiWord(lParam);
-                    window.width = width;
-                    window.height = height;
-                    window.dispatch(l -> l.resize(width, height));
-                    return 0;
-                }
-                case User32.WM_MOVE -> {
-                    window.x = Win32.loWord(lParam);
-                    window.y = Win32.hiWord(lParam);
-                    return 0;
-                }
-                case User32.WM_PAINT -> {
-                    user32.validateRect(hwnd, MemorySegment.NULL);
-                    return 0;
-
-                }
+                gdi32.setPixelFormat(hDC, pixelFormat, pfd);
             }
         }
-        return user32.defWindowProc(hwnd, uMsg, wParam, lParam);
+
+        @Override
+        public void close() {
+            user32.releaseDC(hWnd, hDC);
+        }
+
+        public MemorySegment handle() {
+            return hDC;
+        }
     }
 
     private final MemorySegment hWnd;
-    private final MemorySegment hDC;
-    private int x;
-    private int y;
-    private int width;
-    private int height;
+    private final DeviceContext deviceContext;
 
-    public Win32Window(String title, int width, int height) {
-        this(title, width, height, User32.WS_POPUP);
-    }
-
-    @SuppressWarnings("this-escape")
-    protected Win32Window(String title, int width, int height, int style) {
-        this.width = width;
-        this.height = height;
-        this.hWnd = user32.createWindowEx(
-                0,
-                CLASS_NAME,
-                arena.allocateFrom(title, StandardCharsets.UTF_16LE),
-                style,
-                User32.CW_USEDEFAULT, User32.CW_USEDEFAULT, width, height,
-                MemorySegment.NULL,
-                MemorySegment.NULL,
-                MemorySegment.NULL,
-                MemorySegment.NULL
-        );
-        windows.put(hWnd, this);
-        hDC = user32.getDC(hWnd);
-
-        setPixelFormat(new PixelFormat(PixelFormat.ColorSpace.RGBA, 32, 24, 8));
+    public Win32Window(MemorySegment hWnd) {
+        this.hWnd = hWnd;
+        deviceContext = new DeviceContext();
+        deviceContext.setPixelFormat(new PixelFormat(PixelFormat.ColorSpace.RGBA, 32, 24, 8));
     }
 
     @Override
@@ -125,24 +89,7 @@ public class Win32Window extends ArrayListEventDispatcher<WindowEventListener> i
 
     @Override
     public void swapBuffers() {
-        gdi32.swapBuffers(hDC);
-    }
-
-    @Override
-    public void setPixelFormat(PixelFormat format) {
-        try(Arena arena = Arena.ofConfined()) {
-            MemorySegment pfd = PIXELFORMATDESCRIPTOR.allocate(arena);
-            PIXELFORMATDESCRIPTOR.setNSize(pfd, (short) pfd.byteSize());
-            PIXELFORMATDESCRIPTOR.setNVersion(pfd, (short) 1);
-            PIXELFORMATDESCRIPTOR.setDwFlags(pfd, GDI32.PFD_DRAW_TO_WINDOW | GDI32.PFD_SUPPORT_OPENGL | GDI32.PFD_DOUBLEBUFFER);
-            PIXELFORMATDESCRIPTOR.setIPixelType(pfd, switch (format.colorSpace()) { case PixelFormat.ColorSpace.RGBA -> GDI32.PFD_TYPE_RGBA;});
-            PIXELFORMATDESCRIPTOR.setCColorBits(pfd, (byte) format.colorBits());
-            PIXELFORMATDESCRIPTOR.setILayerType(pfd, (byte) GDI32.PFD_MAIN_PLANE);
-
-            int pixelFormat = gdi32.choosePixelFormat(hDC, pfd);
-
-            gdi32.setPixelFormat(hDC, pixelFormat, pfd);
-        }
+        deviceContext.swapBuffers();
     }
 
     @Override
@@ -157,37 +104,23 @@ public class Win32Window extends ArrayListEventDispatcher<WindowEventListener> i
     }
 
     @Override
-    public int width() {
-        return width;
+    public Rectangle bounds() {
+        try(Arena arena = Arena.ofConfined()) {
+            MemorySegment rect = RECT.allocate(arena);
+            user32.getWindowRect(hWnd, rect);
+
+            return new Rectangle(RECT.left(rect), RECT.right(rect), RECT.top(rect), RECT.bottom(rect));
+        }
     }
 
     @Override
-    public int height() {
-        return height;
-    }
-
-    @Override
-    public void setPosition(int x, int y) {
+    public void setTopLeft(int x, int y) {
         user32.setWindowPos(hWnd, MemorySegment.NULL, x, y, 0, 0, User32.SWP_NOZORDER | User32.SWP_NOSIZE);
     }
 
     @Override
-    public int x() {
-        return x;
-    }
-
-    @Override
-    public int y() {
-        return y;
-    }
-
-    public MemorySegment deviceContext() {
-        return hDC;
-    }
-
-    @Override
     public void dispose() {
-        user32.releaseDC(hWnd, hDC);
+        deviceContext.close();
         user32.destroyWindow(hWnd);
     }
 
@@ -201,5 +134,9 @@ public class Win32Window extends ArrayListEventDispatcher<WindowEventListener> i
     @Override
     public int hashCode() {
         return hWnd.hashCode();
+    }
+
+    public DeviceContext deviceContext() {
+        return deviceContext;
     }
 }
