@@ -1,8 +1,11 @@
 package nowipi.jgui.windows.window;
 
+import nowipi.jgui.input.keyboard.Key;
+import nowipi.jgui.input.mouse.Button;
 import nowipi.jgui.windows.ffm.Win32;
 import nowipi.jgui.windows.ffm.user32.User32;
 import nowipi.jgui.windows.ffm.user32.WNDCLASSEXW;
+import nowipi.jgui.windows.input.Win32Keyboard;
 
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
@@ -13,8 +16,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static nowipi.jgui.windows.ffm.Win32.user32;
-import static nowipi.jgui.windows.ffm.user32.User32.WS_OVERLAPPED;
-import static nowipi.jgui.windows.ffm.user32.User32.WS_OVERLAPPEDWINDOW;
+import static nowipi.jgui.windows.ffm.user32.User32.*;
+import static nowipi.jgui.windows.ffm.user32.User32.WM_XBUTTONUP;
 
 public final class WindowClass {
 
@@ -93,12 +96,93 @@ public final class WindowClass {
                 Win32Window window = instances.get(hwnd);
                 int width = Win32.loWord(lParam);
                 int height = Win32.hiWord(lParam);
-                window.dispatch(l -> l.resize(width, height));
+                window.windowEventDispatcher().dispatch(l -> l.resize(width, height));
                 return 0;
             }
             case User32.WM_PAINT -> {
                 user32.validateRect(hwnd, MemorySegment.NULL);
                 return 0;
+            }
+            case WM_MOUSEMOVE -> {
+                Win32Window window = instances.get(hwnd);
+                int x = Win32.loWord(lParam);
+                int y = Win32.hiWord(lParam);
+                window.mouseEventDispatcher().dispatch(l -> l.move(x, y));
+            }
+            case WM_LBUTTONDOWN -> {
+                Win32Window window = instances.get(hwnd);
+                int x = Win32.loWord(lParam);
+                int y = Win32.hiWord(lParam);
+                window.mouseEventDispatcher().dispatch(l -> l.press(Button.LEFT, x, y));
+            }
+            case WM_LBUTTONUP -> {
+                Win32Window window = instances.get(hwnd);
+                int x = Win32.loWord(lParam);
+                int y = Win32.hiWord(lParam);
+                window.mouseEventDispatcher().dispatch(l -> l.release(Button.LEFT, x, y));
+            }
+            case WM_RBUTTONDOWN -> {
+                Win32Window window = instances.get(hwnd);
+                int x = Win32.loWord(lParam);
+                int y = Win32.hiWord(lParam);
+                window.mouseEventDispatcher().dispatch(l -> l.press(Button.RIGHT, x, y));
+            }
+            case WM_RBUTTONUP -> {
+                Win32Window window = instances.get(hwnd);
+                int x = Win32.loWord(lParam);
+                int y = Win32.hiWord(lParam);
+                window.mouseEventDispatcher().dispatch(l -> l.release(Button.RIGHT, x, y));
+            }
+            case WM_MBUTTONDOWN -> {
+                Win32Window window = instances.get(hwnd);
+                int x = Win32.loWord(lParam);
+                int y = Win32.hiWord(lParam);
+                window.mouseEventDispatcher().dispatch(l -> l.press(Button.MIDDLE, x, y));
+            }
+            case WM_MBUTTONUP -> {
+                Win32Window window = instances.get(hwnd);
+                int x = Win32.loWord(lParam);
+                int y = Win32.hiWord(lParam);
+                window.mouseEventDispatcher().dispatch(l -> l.release(Button.MIDDLE, x, y));
+            }
+            case WM_XBUTTONDOWN -> {
+                int highOrder = Win32.hiWord(wParam);
+                Win32Window window = instances.get(hwnd);
+                int x = Win32.loWord(lParam);
+                int y = Win32.hiWord(lParam);
+                switch (highOrder) {
+                    case 0x0001:
+                        window.mouseEventDispatcher().dispatch(l -> l.press(Button.X1, x, y));
+                        break;
+                    case 0x0002:
+                        window.mouseEventDispatcher().dispatch(l -> l.press(Button.X2, x, y));
+                        break;
+                }
+
+            }
+            case WM_XBUTTONUP -> {
+                int highOrder = Win32.hiWord(wParam);
+                Win32Window window = instances.get(hwnd);
+                int x = Win32.loWord(lParam);
+                int y = Win32.hiWord(lParam);
+                switch (highOrder) {
+                    case 0x0001:
+                        window.mouseEventDispatcher().dispatch(l -> l.release(Button.X1, x, y));
+                        break;
+                    case 0x0002:
+                        window.mouseEventDispatcher().dispatch(l -> l.release(Button.X2, x, y));
+                        break;
+                }
+            }
+            case WM_KEYDOWN -> {
+                Win32Window window = instances.get(hwnd);
+                Key pressedKey = Win32Keyboard.win32VirtualKeyToKey((int) wParam);
+                window.keyboardEventDispatcher().dispatch(l -> l.press(pressedKey));
+            }
+            case WM_KEYUP -> {
+                Win32Window window = instances.get(hwnd);
+                Key releasedKey = Win32Keyboard.win32VirtualKeyToKey((int) wParam);
+                window.keyboardEventDispatcher().dispatch(l -> l.release(releasedKey));
             }
         }
         return user32.defWindowProc(hwnd, uMsg, wParam, lParam);

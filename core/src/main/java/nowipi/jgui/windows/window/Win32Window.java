@@ -1,9 +1,12 @@
 package nowipi.jgui.windows.window;
 
+import nowipi.jgui.event.EventDispatcher;
+import nowipi.jgui.input.keyboard.KeyboardEventListener;
 import nowipi.jgui.window.event.WindowEventListener;
 import nowipi.jgui.window.PixelFormat;
 import nowipi.jgui.window.Window;
 import nowipi.jgui.event.ArrayListEventDispatcher;
+import nowipi.jgui.window.event.WindowMouseListener;
 import nowipi.jgui.windows.ffm.gdi.GDI32;
 import nowipi.jgui.windows.ffm.gdi.PIXELFORMATDESCRIPTOR;
 import nowipi.jgui.windows.ffm.user32.MSG;
@@ -17,7 +20,7 @@ import java.nio.charset.StandardCharsets;
 import static nowipi.jgui.windows.ffm.Win32.gdi32;
 import static nowipi.jgui.windows.ffm.Win32.user32;
 
-public class Win32Window extends ArrayListEventDispatcher<WindowEventListener> implements Window {
+public class Win32Window implements Window {
 
     public class DeviceContext implements AutoCloseable {
 
@@ -59,11 +62,33 @@ public class Win32Window extends ArrayListEventDispatcher<WindowEventListener> i
 
     private final MemorySegment hWnd;
     private final DeviceContext deviceContext;
+    private final EventDispatcher<WindowEventListener> windowEventDispatcher;
+    private final EventDispatcher<WindowMouseListener> mouseEventDispatcher;
+    private final EventDispatcher<KeyboardEventListener> keyboardEventDispatcher;
 
     public Win32Window(MemorySegment hWnd) {
         this.hWnd = hWnd;
         deviceContext = new DeviceContext();
         deviceContext.setPixelFormat(new PixelFormat(PixelFormat.ColorSpace.RGBA, 32, 24, 8));
+
+        windowEventDispatcher = new ArrayListEventDispatcher<>();
+        mouseEventDispatcher = new ArrayListEventDispatcher<>();
+        keyboardEventDispatcher = new ArrayListEventDispatcher<>();
+    }
+
+    @Override
+    public void addListener(WindowEventListener listener) {
+        windowEventDispatcher.addListener(listener);
+    }
+
+    @Override
+    public void addListener(WindowMouseListener listener) {
+        mouseEventDispatcher.addListener(listener);
+    }
+
+    @Override
+    public void addListener(KeyboardEventListener listener) {
+        keyboardEventDispatcher.addListener(listener);
     }
 
     @Override
@@ -138,5 +163,17 @@ public class Win32Window extends ArrayListEventDispatcher<WindowEventListener> i
 
     public DeviceContext deviceContext() {
         return deviceContext;
+    }
+
+    protected EventDispatcher<WindowEventListener> windowEventDispatcher() {
+        return windowEventDispatcher;
+    }
+
+    protected EventDispatcher<WindowMouseListener> mouseEventDispatcher() {
+        return mouseEventDispatcher;
+    }
+
+    protected EventDispatcher<KeyboardEventListener> keyboardEventDispatcher() {
+        return keyboardEventDispatcher;
     }
 }

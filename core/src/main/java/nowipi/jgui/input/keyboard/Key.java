@@ -5,7 +5,7 @@ public enum Key {
     BACK,
     TAB,
     CLEAR,
-    RETURN,
+    ENTER,
     SHIFT,
     CONTROL,
     MENU,

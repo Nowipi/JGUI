@@ -1,5 +1,8 @@
-package nowipi.jgui.input.mouse;
+package testing;
 
+import nowipi.jgui.input.mouse.Button;
+import nowipi.jgui.input.mouse.Mouse;
+import nowipi.jgui.input.mouse.MouseEventListener;
 import nowipi.jgui.window.Window;
 import nowipi.jgui.windows.input.Win32Mouse;
 

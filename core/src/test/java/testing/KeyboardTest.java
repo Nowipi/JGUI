@@ -1,5 +1,7 @@
-package nowipi.jgui.input.keyboard;
+package testing;
 
+import nowipi.jgui.input.keyboard.Key;
+import nowipi.jgui.input.keyboard.KeyboardEventListener;
 import nowipi.jgui.window.Window;
 import nowipi.jgui.windows.input.Win32Keyboard;
 

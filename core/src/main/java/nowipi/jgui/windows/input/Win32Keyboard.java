@@ -114,12 +114,12 @@ public class Win32Keyboard extends ArrayListEventDispatcher<KeyboardEventListene
         arena.close();
     }
 
-    private Key win32VirtualKeyToKey(int vk) {
+    public static Key win32VirtualKeyToKey(int vk) {
         return switch (vk) {
             case VK_BACK -> Key.BACK;
             case VK_TAB -> Key.TAB;
             case VK_CLEAR -> Key.CLEAR;
-            case VK_RETURN -> Key.RETURN;
+            case VK_RETURN -> Key.ENTER;
             case VK_SHIFT -> Key.SHIFT;
             case VK_CONTROL -> Key.CONTROL;
             case VK_MENU -> Key.MENU;
