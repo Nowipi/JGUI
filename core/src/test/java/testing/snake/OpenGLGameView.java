@@ -53,7 +53,7 @@ final class OpenGLGameView {
         float aspectRatio = windowBounds.width() / windowBounds.height();
         Matrix4f projectionMatrix = Matrix4f.ortho(0, game.height() * aspectRatio, 0, game.height(), -1, 1);
         quadRenderer = new BatchedQuadRenderer(projectionMatrix, gc);
-        snakeView = new OpenGLSnakeView(quadRenderer, new TextureRenderer(projectionMatrix, gc), gc);
+        snakeView = new OpenGLSnakeView(quadRenderer, gc);
 
 
         window.show();
