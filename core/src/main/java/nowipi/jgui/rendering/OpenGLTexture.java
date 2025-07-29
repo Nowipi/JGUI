@@ -1,6 +1,5 @@
 package nowipi.jgui.rendering;
 
-import nowipi.opengl.OpenGL;
 import nowipi.opengl.OpenGLGraphicsContext;
 
 import java.lang.foreign.Arena;
@@ -27,7 +26,7 @@ public final class OpenGLTexture {
             id = idPointer.get(ValueLayout.JAVA_INT, 0);
 
             bind();
-            gc.glTexImage2D(OpenGL.GL_TEXTURE_2D, 0, OpenGL.GL_RGBA, width, height, 0, OpenGL.GL_RGBA, OpenGL.GL_UNSIGNED_BYTE, MemorySegment.ofArray(data));
+            OpenGL.glTexImage2D(gc, OpenGL.GL_TEXTURE_2D, 0, OpenGL.GL_RGBA, width, height, 0, OpenGL.GL_RGBA, OpenGL.GL_UNSIGNED_BYTE, data);
         }
 
 

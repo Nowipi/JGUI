@@ -160,4 +160,10 @@ public final class OpenGL extends nowipi.opengl.OpenGL {
             gc.glUniformMatrix4fv(location, 1, toGL_BOOL(transpose), arena.allocateFrom(ValueLayout.JAVA_FLOAT, matrix));
         }
     }
+
+    public static void glTexImage2D(OpenGLGraphicsContext gc, int target, int level, int internalformat, int width, int height, int border, int format, int type, byte[] data) {
+        try (var arena = Arena.ofConfined()) {
+            gc.glTexImage2D(target, level, internalformat, width, height, border, format, type, arena.allocateFrom(ValueLayout.JAVA_BYTE, data));
+        }
+    }
 }

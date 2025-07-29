@@ -8,7 +8,7 @@ import java.awt.image.BufferedImage;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-final class ResourceManager {
+public final class ResourceManager {
 
     public static OpenGLTexture loadTexture(String fileName, OpenGLGraphicsContext gc) throws IOException {
         try(var in = ResourceManager.class.getResourceAsStream(fileName)) {
