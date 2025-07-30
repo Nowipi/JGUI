@@ -50,4 +50,9 @@ public final class WNDCLASSEXW {
         MemoryLayout.PathElement path = groupElement("hCursor");
         wndClass.set((AddressLayout) layout.select(path), layout.byteOffset(path), hCursor);
     }
+
+    public static void setHbrBackground(MemorySegment wndClass, MemorySegment hbrBackground) {
+        MemoryLayout.PathElement path = groupElement("hbrBackground");
+        wndClass.set((AddressLayout) layout.select(path), layout.byteOffset(path), hbrBackground);
+    }
 }

@@ -23,7 +23,7 @@ public class Win32Keyboard extends ArrayListEventDispatcher<KeyboardEventListene
     private static final int INITIAL_CAPACITY_BASED_ON_ROLL_OVER = 6;
 
     private final Arena arena;
-    private MemorySegment hook;
+    private final MemorySegment hook;
     private final Set<Key> pressedKeys;
 
     @SuppressWarnings("this-escape")

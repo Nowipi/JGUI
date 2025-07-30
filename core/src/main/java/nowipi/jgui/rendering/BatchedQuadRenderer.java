@@ -158,4 +158,6 @@ public final class BatchedQuadRenderer implements Renderer {
         gc.glUseProgram(shader);
         OpenGL.glUniformMatrix4fv(gc, projectionUniformLocation, false, projection.toArray());
     }
+
+
 }

@@ -7,6 +7,7 @@ import nowipi.jgui.rendering.BatchedQuadRenderer;
 import nowipi.jgui.rendering.OpenGL;
 import nowipi.jgui.rendering.TextureRenderer;
 import nowipi.jgui.window.Window;
+import nowipi.jgui.window.event.WindowEventListener;
 import nowipi.opengl.OpenGLGraphicsContext;
 import nowipi.primitives.Matrix4f;
 import nowipi.primitives.Rectangle;
@@ -15,8 +16,7 @@ import nowipi.primitives.Vector2f;
 import java.util.List;
 import java.util.Optional;
 
-import static nowipi.opengl.OpenGL.GL_COLOR_BUFFER_BIT;
-import static nowipi.opengl.OpenGL.GL_DEPTH_BUFFER_BIT;
+import static nowipi.opengl.OpenGL.*;
 
 final class OpenGLGameView {
 
@@ -26,6 +26,7 @@ final class OpenGLGameView {
     private final Window window;
     private final OpenGLGraphicsContext gc;
     private final BatchedQuadRenderer quadRenderer;
+    private final TextureRenderer textureRenderer;
 
     public OpenGLGameView(Game game) {
         window = Window.createWindowed("Snake", 1080, 720);
@@ -47,27 +48,41 @@ final class OpenGLGameView {
 
             }
         });
-        gc = OpenGL.createGraphicsContext(window);
+
+        window.addListener(new WindowEventListener() {
+            @Override
+            public void resize(int width, int height) {
+                gc.glViewport(0, 0, width, height);
+                Matrix4f projectionMatrix = calculateProjectionMatrix(width, height, game.height());
+                quadRenderer.setProjection(projectionMatrix);
+                textureRenderer.setProjection(projectionMatrix);
+            }
+        });
+        gc = OpenGL.createGraphicsContext(window, 3, 3, OpenGL.Profile.CORE);
 
         Rectangle windowBounds = window.bounds();
-        float aspectRatio = windowBounds.width() / windowBounds.height();
-        Matrix4f projectionMatrix = Matrix4f.ortho(0, game.height() * aspectRatio, 0, game.height(), -1, 1);
+        Matrix4f projectionMatrix = calculateProjectionMatrix((int) windowBounds.width(), (int) windowBounds.height(), game.height());
         quadRenderer = new BatchedQuadRenderer(projectionMatrix, gc);
-        snakeView = new OpenGLSnakeView(quadRenderer, gc);
-
+        textureRenderer = new TextureRenderer(projectionMatrix, gc);
+        snakeView = new OpenGLSnakeView(quadRenderer, textureRenderer, gc);
 
         window.show();
+    }
+
+    private static Matrix4f calculateProjectionMatrix(int windowWidth, int windowHeight, int gameHeight) {
+        float aspectRatio = (float) windowWidth / windowHeight;
+        return Matrix4f.ortho(0, gameHeight * aspectRatio, 0, gameHeight, -1, 1);
     }
 
     public void draw(Game game) {
         window.pollEvents();
 
         gc.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        gc.glClearColor(1f, 1f, 1f, 1f);
+        gc.glClearColor(0, 0, 0, 1f);
 
         quadRenderer.beginFrame();
 
-        snakeView.draw(game.snake());
+        snakeView.draw(game.snake(), game.direction());
 
         drawFood(game.food());
 
@@ -84,5 +99,9 @@ final class OpenGLGameView {
 
     public boolean isWindowOpen() {
         return !window.shouldClose();
+    }
+
+    public OpenGLSnakeView snakeView() {
+        return snakeView;
     }
 }

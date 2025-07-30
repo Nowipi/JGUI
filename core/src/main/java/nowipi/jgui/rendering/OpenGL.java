@@ -2,7 +2,6 @@ package nowipi.jgui.rendering;
 
 import nowipi.jgui.window.Window;
 import nowipi.jgui.windows.window.Win32Window;
-import nowipi.opengl.GraphicsContext;
 import nowipi.opengl.OpenGLGraphicsContext;
 import nowipi.opengl.win32.WGLGraphicsContext;
 import nowipi.opengl.win32.WGLGraphicsContextExtensionImpl;
@@ -12,8 +11,6 @@ import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 
 import static nowipi.opengl.win32.WGLGraphicsContext.*;
-import static nowipi.opengl.win32.WGLGraphicsContext.WGL_CONTEXT_CORE_PROFILE_BIT_ARB;
-import static nowipi.opengl.win32.WGLGraphicsContext.WGL_CONTEXT_FLAGS_ARB;
 
 public final class OpenGL extends nowipi.opengl.OpenGL {
 

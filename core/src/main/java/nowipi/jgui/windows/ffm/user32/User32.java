@@ -59,6 +59,7 @@ public interface User32 {
     int WM_MBUTTONUP = 0x0208;
     int WM_XBUTTONDOWN = 0x020B;
     int WM_XBUTTONUP = 0x020C;
+    int WM_ERASEBKGND = 0x0014;
 
     int MK_XBUTTON1 = 0x0020;
     int MK_XBUTTON2 = 0x0040;
@@ -335,4 +336,13 @@ public interface User32 {
 
     @Function("GetCursorPos")
     int getCursorPos(MemorySegment lpPoint);
+
+    @Function("UpdateWindow")
+    int updateWindow(MemorySegment hWnd);
+
+    @Function("BeginPaint")
+    MemorySegment beginPaint(MemorySegment hWnd, MemorySegment lpPaint);
+
+    @Function("EndPaint")
+    int endPaint(MemorySegment hWnd, MemorySegment lpPaint);
 }

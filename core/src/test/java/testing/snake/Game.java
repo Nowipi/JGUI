@@ -1,5 +1,6 @@
 package testing.snake;
 
+import nowipi.jgui.Color;
 import nowipi.primitives.Vector2f;
 
 import java.util.ArrayList;
@@ -36,7 +37,7 @@ final class Game {
 
     private void updateLoop() {
         final int TICKS_PER_SECOND = 20;
-        final long TIME_PER_TICK = 1000 / TICKS_PER_SECOND; // 50 ms
+        final long TIME_PER_TICK = 3000 / TICKS_PER_SECOND; // 50 ms
         long lastUpdateTime = System.currentTimeMillis();
         long accumulator = 0;
 
@@ -59,10 +60,15 @@ final class Game {
         }
     }
 
+    private Color randomColor() {
+        return new Color(randomGenerator.nextInt(256), randomGenerator.nextInt(256), randomGenerator.nextInt(256), 255);
+    }
+
     private boolean isCollidingWithFood() {
         for (int i = 0; i < food.size(); i++) {
             Vector2f foodPosition = this.food.get(i);
             if (snake.head().equals(foodPosition)) {
+                gameView.snakeView().setColor(randomColor());
                 this.food.remove(i);
                 spawnFood();
                 return true;
@@ -106,5 +112,9 @@ final class Game {
 
     public int height() {
         return height;
+    }
+
+    public Vector2f direction() {
+        return direction;
     }
 }

@@ -17,7 +17,6 @@ import java.util.Map;
 
 import static nowipi.jgui.windows.ffm.Win32.user32;
 import static nowipi.jgui.windows.ffm.user32.User32.*;
-import static nowipi.jgui.windows.ffm.user32.User32.WM_XBUTTONUP;
 
 public final class WindowClass {
 
@@ -53,6 +52,8 @@ public final class WindowClass {
 
             WNDCLASSEXW.sethCursor(windowClass, user32.loadCursorA(MemorySegment.NULL, User32.IDC_ARROW));
             WNDCLASSEXW.setStyle(windowClass, User32.CS_HREDRAW | User32.CS_VREDRAW | User32.CS_OWNDC);
+
+            WNDCLASSEXW.setHbrBackground(windowClass, MemorySegment.NULL);
 
             user32.registerClassEx(windowClass);
         } catch (NoSuchMethodException | IllegalAccessException e) {
@@ -97,11 +98,6 @@ public final class WindowClass {
                 int width = Win32.loWord(lParam);
                 int height = Win32.hiWord(lParam);
                 window.windowEventDispatcher().dispatch(l -> l.resize(width, height));
-                return 0;
-            }
-            case User32.WM_PAINT -> {
-                user32.validateRect(hwnd, MemorySegment.NULL);
-                return 0;
             }
             case WM_MOUSEMOVE -> {
                 Win32Window window = instances.get(hwnd);
@@ -184,8 +180,11 @@ public final class WindowClass {
                 Key releasedKey = Win32Keyboard.win32VirtualKeyToKey((int) wParam);
                 window.keyboardEventDispatcher().dispatch(l -> l.release(releasedKey));
             }
+            default -> {
+                return user32.defWindowProc(hwnd, uMsg, wParam, lParam);
+            }
         }
-        return user32.defWindowProc(hwnd, uMsg, wParam, lParam);
+        return 1;
     }
 
     public MemorySegment name() {
