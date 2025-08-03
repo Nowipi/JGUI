@@ -58,7 +58,7 @@ final class OpenGLGameView {
                 textureRenderer.setProjection(projectionMatrix);
             }
         });
-        gc = OpenGL.createGraphicsContext(window, 3, 3, OpenGL.Profile.CORE);
+        gc = OpenGL.createGraphicsContext(window, 4, 6, OpenGL.Profile.CORE);
 
         Rectangle windowBounds = window.bounds();
         Matrix4f projectionMatrix = calculateProjectionMatrix((int) windowBounds.width(), (int) windowBounds.height(), game.height());

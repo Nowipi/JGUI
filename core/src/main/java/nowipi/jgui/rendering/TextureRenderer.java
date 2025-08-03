@@ -1,8 +1,6 @@
 package nowipi.jgui.rendering;
 
-import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
-import java.lang.foreign.ValueLayout;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,17 +12,10 @@ import static nowipi.opengl.OpenGL.*;
 public final class TextureRenderer implements Renderer {
 
     private final int shader;
-    private static final float[] vertices = {
-            // pos      // tex
-            0.0f, 1.0f, 0.0f, 1.0f,
-            1.0f, 0.0f, 1.0f, 0.0f,
-            0.0f, 0.0f, 0.0f, 0.0f,
-            1.0f, 1.0f, 1.0f, 1.0f,
-    };
-
-    private final int quadVAO;
+    private final int VAO;
     private final int VBO;
     private final int EBO;
+
     private final OpenGLGraphicsContext gc;
 
     public TextureRenderer(Matrix4f projection, OpenGLGraphicsContext gc) {
@@ -57,7 +48,7 @@ public final class TextureRenderer implements Renderer {
                 uniform vec4 spriteColor;
                 
                 void main()
-                {   \s
+                {
                     color = spriteColor * texture(image, TexCoords);
                 }""";
         OpenGL.glShaderSource(gc, fragmentShader, source);
@@ -72,15 +63,19 @@ public final class TextureRenderer implements Renderer {
         gc.glDeleteShader(fragmentShader);
 
 
-        quadVAO = OpenGL.glGenVertexArray(gc);
+        gc.glUseProgram(shader);
+        gc.glUniform1i(getUniform("image"), 0);
 
+        setProjection(projection);
+
+
+        VAO = OpenGL.glGenVertexArray(gc);
         VBO = OpenGL.glGenBuffer(gc);
-
         EBO =  OpenGL.glGenBuffer(gc);
 
-        gc.glBindVertexArray(quadVAO);
-
+        gc.glBindVertexArray(VAO);
         gc.glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        gc.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 
 
         gc.glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * Float.BYTES, 0);
@@ -88,15 +83,6 @@ public final class TextureRenderer implements Renderer {
 
         gc.glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * Float.BYTES, 2 * Float.BYTES);
         gc.glEnableVertexAttribArray(1);
-
-        gc.glBindBuffer(GL_ARRAY_BUFFER, 0);
-        gc.glBindVertexArray(0);
-
-
-        gc.glUseProgram(shader);
-        gc.glUniform1i(getUniform("image"), 0);
-
-        setProjection(projection);
 
     }
 
@@ -106,7 +92,7 @@ public final class TextureRenderer implements Renderer {
 
     public void drawTexture(OpenGLTexture texture, Rectangle bounds, float r, float g, float b, float a) {
 
-        float[] vertexData = new float[6 * 4];
+        float[] vertexData = new float[16];
         int[] indexData = new int[6];
         int vertexDataIndex = 0;
         int indexDataIndex = 0;
@@ -141,7 +127,9 @@ public final class TextureRenderer implements Renderer {
         indexData[indexDataIndex] = 3;
 
 
-        gc.glBindVertexArray(quadVAO);
+
+
+        gc.glBindVertexArray(VAO);
         gc.glBindBuffer(GL_ARRAY_BUFFER, VBO);
         OpenGL.glBufferData(gc, GL_ARRAY_BUFFER, vertexData, GL_DYNAMIC_DRAW);
 
@@ -156,7 +144,6 @@ public final class TextureRenderer implements Renderer {
         gc.glActiveTexture(OpenGL.GL_TEXTURE0);
         texture.bind();
 
-        gc.glBindVertexArray(quadVAO);
         gc.glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, MemorySegment.NULL);
     }
 
@@ -176,9 +163,10 @@ public final class TextureRenderer implements Renderer {
     }
 
     public void dispose() {
-        try(var arena = Arena.ofConfined()) {
-            gc.glDeleteVertexArrays(1, arena.allocateFrom(ValueLayout.JAVA_INT, quadVAO));
-        }
+        OpenGL.glDeleteBuffer(gc, VBO);
+        OpenGL.glDeleteBuffer(gc, EBO);
+        OpenGL.glDeleteVertexArray(gc, VAO);
+        gc.glDeleteProgram(shader);
     }
 
     @Override

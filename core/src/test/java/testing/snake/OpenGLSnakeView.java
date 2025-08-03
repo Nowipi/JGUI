@@ -29,15 +29,14 @@ final class OpenGLSnakeView {
     }
 
     public void draw(Snake snake, Vector2f direction) {
-        textureRenderer.beginFrame();
 
         Vector2f textureOrigin = snake.head();
         Rectangle textureBounds = Rectangle.fromCenter(textureOrigin, Vector2f.newUniformVector(1));
         rotate(textureBounds, textureOrigin, Math.atan2(direction.y, direction.x) + (Math.PI * 0.5));
         textureRenderer.drawTexture(headTexture, textureBounds, color.r(), color.g(), color.b(), color.a());
-        textureRenderer.endFrame();
         for (int i = 1; i < snake.length(); i++) {
-            quadRenderer.drawQuad(Rectangle.fromCenter(snake.body().get(i), Vector2f.newUniformVector(1)), color.r(), color.g(), color.b(), color.a());
+            Rectangle bodyBounds = Rectangle.fromCenter(snake.body().get(i), Vector2f.newUniformVector(1));
+            quadRenderer.drawQuad(bodyBounds, color.r(), color.g(), color.b(), color.a());
         }
     }
 

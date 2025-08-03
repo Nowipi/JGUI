@@ -3,6 +3,7 @@ package testing.snake;
 import nowipi.primitives.Vector2f;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 final class Snake {
