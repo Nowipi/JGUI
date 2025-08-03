@@ -6,7 +6,5 @@ public interface WindowedWindow extends Window {
     void minimize();
     void restore();
     void resize(int width, int height);
-    void setWidth(int width);
-    void setHeight(int height);
 
 }

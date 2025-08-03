@@ -36,6 +36,9 @@ public interface User32 {
     int WS_VSCROLL = 0x00200000;
     int CW_USEDEFAULT = 0x80000000;
     int SW_SHOW = 5;
+    int SW_MINIMIZE = 6;
+    int SW_MAXIMIZE = 3;
+    int SW_RESTORE = 9;
     int PM_REMOVE = 0x0001;
 
     int WM_CREATE = 0x0001;
@@ -70,6 +73,7 @@ public interface User32 {
 
     int SWP_NOZORDER = 0x0004;
     int SWP_NOSIZE = 0x0001;
+    int SWP_NOMOVE = 0x0002;
 
     int INPUT_MOUSE = 0;
     int INPUT_KEYBOARD = 1;
