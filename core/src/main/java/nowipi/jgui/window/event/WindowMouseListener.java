@@ -8,6 +8,6 @@ public interface WindowMouseListener extends EventListener {
     void press(Button button, int windowClientAreaX, int windowClientAreaY);
     void release(Button button, int windowClientAreaX, int windowClientAreaY);
 
-    void move(float windowClientAreaX, float windowClientAreaY);
+    void move(int windowClientAreaX, int windowClientAreaY);
 
 }

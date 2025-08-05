@@ -1,8 +1,11 @@
 package nowipi.jgui.component.checkbox;
 
-public class Checkbox {
+import nowipi.jgui.component.Component;
+import nowipi.jgui.component.interaction.MouseInteraction;
 
-    private boolean checked = false;
+public class Checkbox implements Component, MouseInteraction {
+
+    private boolean checked;
 
     public void check() {
         checked = !checked;
@@ -10,5 +13,25 @@ public class Checkbox {
 
     public boolean isChecked() {
         return checked;
+    }
+
+    @Override
+    public void mouseEnter(int screenX, int screenY) {
+
+    }
+
+    @Override
+    public void mouseExit(int screenX, int screenY) {
+
+    }
+
+    @Override
+    public void mousePress(int screenX, int screenY) {
+
+    }
+
+    @Override
+    public void mouseRelease(int screenX, int screenY) {
+        check();
     }
 }

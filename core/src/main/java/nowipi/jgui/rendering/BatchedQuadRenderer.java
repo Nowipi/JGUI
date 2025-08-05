@@ -104,6 +104,8 @@ public final class BatchedQuadRenderer implements Renderer {
      * @param a
      */
     public void drawQuad(Quad quad, float r, float g, float b, float a) {
+        if (quad == null)
+            return;
         quads.add(new QuadDrawCommand(quad, r, g, b, a));
     }
 

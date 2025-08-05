@@ -1,4 +1,4 @@
 package nowipi.jgui.component;
 
-public interface Component {
+public interface Behavior {
 }

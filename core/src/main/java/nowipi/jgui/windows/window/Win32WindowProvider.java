@@ -18,6 +18,6 @@ public final class Win32WindowProvider implements WindowProvider {
 
     @Override
     public Window createBorderless(String title, int width, int height) {
-        return WINDOW_CLASS.createInstance("", width, height, WS_POPUP);
+        return WINDOW_CLASS.createInstance(title, width, height, WS_POPUP);
     }
 }

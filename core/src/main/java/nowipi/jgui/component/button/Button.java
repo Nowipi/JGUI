@@ -1,32 +1,65 @@
 package nowipi.jgui.component.button;
 
 import nowipi.jgui.component.Component;
+import nowipi.jgui.component.interaction.MouseInteraction;
 
-public class Button implements Component {
+public abstract class Button implements Component, MouseInteraction {
 
+    private boolean hovered;
+    private boolean pressed;
 
-    private ButtonState state;
+    public abstract void click();
 
-    public Button() {
-        state = ButtonState.NORMAL;
+    public void press() {
+        pressed = true;
     }
 
-    public void click() {}
+    public void release() {
+        pressed = false;
 
-    protected void setState(ButtonState state) {
-        this.state = state;
+        if (hovered) {
+            click();
+        }
     }
 
-    protected ButtonState state() {
-        return state;
+    public void hover() {
+        hovered = true;
     }
 
-    public boolean isPressed() {
-        return state == ButtonState.PRESSED;
+    public void unHover() {
+        hovered = false;
     }
 
     public boolean isHovered() {
-        return state == ButtonState.HOVERED || state == ButtonState.PRESSED;
+        return hovered;
     }
 
+    public boolean isPressed() {
+        return pressed;
+    }
+
+    @Override
+    public void mouseEnter(int screenX, int screenY) {
+        hover();
+    }
+
+    @Override
+    public void mouseExit(int screenX, int screenY) {
+        unHover();
+        release();
+    }
+
+    @Override
+    public void mousePress(int screenX, int screenY) {
+        press();
+    }
+
+    @Override
+    public void mouseRelease(int screenX, int screenY) {
+        release();
+
+        if (isHovered()) {
+            click();
+        }
+    }
 }

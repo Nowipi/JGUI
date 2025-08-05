@@ -4,17 +4,17 @@ import nowipi.jgui.component.Component;
 
 public class Text implements Component {
 
-    private String text;
+    private String string;
 
-    public Text(String text) {
-        this.text = text;
+    public Text(String string) {
+        this.string = string;
     }
 
-    public String text() {
-        return text;
+    public String string() {
+        return string;
     }
 
-    public void setText(String text) {
-        this.text = text;
+    public void setString(String string) {
+        this.string = string;
     }
 }
