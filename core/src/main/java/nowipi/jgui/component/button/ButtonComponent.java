@@ -15,6 +15,8 @@ public abstract class ButtonComponent implements Component, MouseInteraction {
     }
 
     public void release() {
+        if (!pressed) return;
+
         pressed = false;
 
         if (hovered) {

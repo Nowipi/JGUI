@@ -26,7 +26,6 @@ public class Checkbox extends CheckboxComponent {
 
     @Override
     public void draw(ComponentRenderer renderer) {
-        System.out.println(bounds.topLeft);
         if (isChecked()) {
             renderer.drawQuad(bounds, Color.BLUE);
         } else {
