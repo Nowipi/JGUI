@@ -1,4 +1,4 @@
-package testing.todo.combined;
+package testing.todo;
 
 import nowipi.jgui.component.look.ComponentRenderer;
 import nowipi.jgui.rendering.OpenGL;
@@ -13,8 +13,7 @@ final class Main {
         OpenGLGraphicsContext gc = OpenGL.createGraphicsContext(window, 3, 2, OpenGL.Profile.CORE);
 
         Todo todo = new Todo();
-        todo.addItem(new Item("Rendering"));
-        TodoView todoView = new TodoView(todo);
+        todo.addItem("Rendering");
 
         Rectangle windowBounds = window.bounds();
         ComponentRenderer renderer = new ComponentRenderer(calculateProjectionMatrix((int) windowBounds.width(), (int) windowBounds.height()), gc);
@@ -24,7 +23,7 @@ final class Main {
             renderer.setProjectionMatrix(calculateProjectionMatrix(width, height));
 
         });
-        window.addListener(todoView.mouseInteractionListener());
+        window.addListener(todo.mouseInteractionListener());
 
         window.show();
 
@@ -36,7 +35,7 @@ final class Main {
             gc.glClearColor(1, 0, 1, 1);
 
             renderer.startFrame();
-            todoView.draw(todo, renderer);
+            todo.draw(renderer);
             renderer.endFrame();
 
             window.swapBuffers();

@@ -1,37 +1,50 @@
 package nowipi.jgui.component.checkbox;
 
-import nowipi.jgui.component.Component;
-import nowipi.jgui.component.interaction.MouseInteraction;
+import nowipi.jgui.Color;
+import nowipi.jgui.Font;
+import nowipi.jgui.component.look.ComponentRenderer;
+import nowipi.primitives.Rectangle;
 
-public class Checkbox implements Component, MouseInteraction {
+public class Checkbox extends CheckboxComponent {
 
-    private boolean checked;
+    private final Rectangle bounds;
+    private Font font;
 
-    public void check() {
-        checked = !checked;
+    public Checkbox(Font font) {
+        final float fontSize = font.size();
+        bounds = Rectangle.fromBottomLeft(0, 0, fontSize, fontSize);
+        this.font = font;
     }
 
-    public boolean isChecked() {
-        return checked;
-    }
+    private void growFromBottomLeft(float amount) {
+        bounds.topRight.x = bounds.topLeft.x + amount;
+        bounds.bottomRight.x = bounds.bottomLeft.x + amount;
 
-    @Override
-    public void mouseEnter(int screenX, int screenY) {
-
-    }
-
-    @Override
-    public void mouseExit(int screenX, int screenY) {
-
-    }
-
-    @Override
-    public void mousePress(int screenX, int screenY) {
-
+        bounds.topLeft.y = bounds.bottomLeft.y + amount;
+        bounds.topRight.y = bounds.bottomRight.y + amount;
     }
 
     @Override
-    public void mouseRelease(int screenX, int screenY) {
-        check();
+    public void draw(ComponentRenderer renderer) {
+        System.out.println(bounds.topLeft);
+        if (isChecked()) {
+            renderer.drawQuad(bounds, Color.BLUE);
+        } else {
+            renderer.drawQuad(bounds, Color.BLACK);
+        }
+    }
+
+    @Override
+    public Rectangle bounds() {
+        return bounds;
+    }
+
+    public void setFont(Font font) {
+        this.font = font;
+        growFromBottomLeft(font.size());
+    }
+
+    public Font font() {
+        return font;
     }
 }

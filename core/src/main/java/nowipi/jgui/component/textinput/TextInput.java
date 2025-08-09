@@ -1,134 +1,65 @@
 package nowipi.jgui.component.textinput;
 
-import nowipi.jgui.component.Component;
-import nowipi.jgui.component.interaction.KeyboardInteraction;
-import nowipi.jgui.component.interaction.MouseInteraction;
-import nowipi.jgui.input.keyboard.Key;
+import nowipi.jgui.Color;
+import nowipi.jgui.Font;
+import nowipi.jgui.component.look.ComponentRenderer;
+import nowipi.primitives.Rectangle;
 
-import java.util.LinkedList;
+public class TextInput extends TextInputComponent {
 
-public class TextInput implements Component, MouseInteraction, KeyboardInteraction {
+    private final Rectangle bounds;
+    private Font font;
+    private Color backgroundColor;
+    private Color textColor;
 
-    private final LinkedList<Character> characters;
-    private int cursor;
-    private Selection selection;
-
-    private static class Selection {
-        private final int start;
-        private int end;
-
-        public Selection(int start) {
-            this.start = start;
-        }
-
-        public int start() {
-            return start;
-        }
-
-        public int end() {
-            return end;
-        }
-
-        public void setEnd(int end) {
-            this.end = end;
-        }
+    public TextInput(Font font, Color backgroundColor, Color textColor) {
+        bounds = Rectangle.fromBottomLeft(0, 0, 10, font.size());
+        this.font = font;
+        this.backgroundColor = backgroundColor;
+        this.textColor = textColor;
     }
 
-    public TextInput() {
-        characters = new LinkedList<>();
-    }
+    public void growFromBottomLeft(float width, float height) {
+        bounds.topRight.x = bounds.topLeft.x + width;
+        bounds.bottomRight.x = bounds.bottomLeft.x + width;
 
-
-    public void input(char character) {
-        characters.add(cursor++, character);
-    }
-
-    public String input() {
-        char[] array = new char[characters.size()];
-        for (int i = 0; i < array.length; i++) {
-            char character = characters.get(i);
-            array[i] = character;
-        }
-        return new String(array);
-    }
-
-    public void setCursor(int location) {
-        if (location < 0 ||  location > characters.size()) {
-            throw new IndexOutOfBoundsException("Invalid cursor location " + cursor);
-        }
-
-        if (selection != null) {
-            selection.setEnd(location);
-        }
-        cursor = location;
-    }
-
-    public void setCursorToEnd() {
-        setCursor(characters.size());
-    }
-
-    public int cursor() {
-        return cursor;
-    }
-
-    public void delete() {
-        if (selection != null) {
-            characters.subList(Math.min(selection.start(), selection.end()), Math.max(selection.start(), selection.end())).clear();
-
-        } else {
-            if (cursor > 0) {
-                characters.remove(cursor - 1);
-            }
-        }
-    }
-
-    public void select() {
-        selection = new Selection(cursor);
-    }
-
-    public void deselect() {
-        selection = null;
+        bounds.topLeft.y = bounds.bottomLeft.y + height;
+        bounds.topRight.y = bounds.bottomRight.y + height;
     }
 
     @Override
-    public void mouseEnter(int screenX, int screenY) {
-
+    public void draw(ComponentRenderer renderer) {
+        renderer.drawQuad(bounds, backgroundColor);
     }
 
     @Override
-    public void mouseExit(int screenX, int screenY) {
-
+    public Rectangle bounds() {
+        return bounds;
     }
 
-    @Override
-    public void mousePress(int screenX, int screenY) {
-        setCursor(mouseLocationToIndex(screenX, screenY));
+    public Font font() {
+        return font;
     }
 
-    private int mouseLocationToIndex(int screenX, int screenY) {
-        //TODO look needed for this
-        return 0;
+    public void setFont(Font font) {
+        this.font = font;
+
+        growFromBottomLeft(font.stringWidth(input()), font.size());
     }
 
-    @Override
-    public void mouseRelease(int screenX, int screenY) {
-
+    public Color backgroundColor() {
+        return backgroundColor;
     }
 
-    @Override
-    public void keyPress(Key key) {
-
-        switch (key) {
-            case DELETE:
-                delete();
-                break;
-            default:
-                input((char) key.ordinal());
-        }
+    public void setBackgroundColor(Color backgroundColor) {
+        this.backgroundColor = backgroundColor;
     }
 
-    @Override
-    public void keyRelease(Key key) {
+    public Color textColor() {
+        return textColor;
+    }
 
+    public void setTextColor(Color textColor) {
+        this.textColor = textColor;
     }
 }

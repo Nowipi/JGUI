@@ -1,22 +1,43 @@
 package nowipi.jgui.component.container;
 
 
+import nowipi.jgui.Color;
 import nowipi.jgui.component.Component;
-import nowipi.jgui.component.look.Look;
+import nowipi.jgui.component.look.ComponentRenderer;
 import nowipi.primitives.Rectangle;
 import nowipi.primitives.Vector2f;
 
-public abstract class Container<C extends Component> implements Look<C> {
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
+public class Container implements Component {
+
+    private final List<Component> children;
+    private Color backgroundColor;
     private final FlowDirection flowDirection;
+    private Rectangle bounds;
+
+    public Container(Color backgroundColor, FlowDirection flowDirection, Component ...children) {
+        this(backgroundColor, flowDirection, new ArrayList<>(Arrays.asList(children)));
+    }
 
     @SuppressWarnings("this-escape")
-    public Container(FlowDirection flowDirection, Rectangle ...bounds) {
+    private Container(Color backgroundColor, FlowDirection flowDirection, List<Component> children) {
+        this.children = children;
+        this.backgroundColor = backgroundColor;
         this.flowDirection = flowDirection;
 
-        for (Rectangle bound : bounds) {
-            addBounds(bound);
+        updateBounds();
+    }
+
+    @Override
+    public void draw(ComponentRenderer renderer) {
+        renderer.drawQuad(bounds, backgroundColor);
+        for (Component child : children) {
+            child.draw(renderer);
         }
+
     }
 
     private void add(Rectangle src, Rectangle dst) {
@@ -30,8 +51,34 @@ public abstract class Container<C extends Component> implements Look<C> {
         dst.bottomLeft.add(addend);
     }
 
-    //TODO update children positions
-    private Rectangle calculateBounds() {
+    public void updateBounds() {
+        float maxWidth = 0;
+        float maxHeight = 0;
+        float accumulatedWidth = 0;
+        float accumulatedHeight = 0;
+
+        Rectangle lastBounds = new Rectangle(0,0,0,0);
+        for (Component child : children) {
+
+            Rectangle childBounds = child.bounds();
+            final float childWidth = childBounds.width();
+            final float childHeight = childBounds.height();
+            add(lastBounds, childBounds);
+
+            accumulatedWidth += childWidth;
+            accumulatedHeight += childHeight;
+
+            if (maxWidth < childWidth) {
+                maxWidth = childWidth;
+            }
+
+            if (maxHeight < childHeight) {
+                maxHeight = childHeight;
+            }
+
+            lastBounds = childBounds;
+        }
+
         float width = 0;
         float height = 0;
         switch (flowDirection) {
@@ -44,36 +91,29 @@ public abstract class Container<C extends Component> implements Look<C> {
                 height = maxHeight;
             }
         }
-        return new Rectangle(Vector2f.newZeroVector(), new Vector2f(width, 0), new Vector2f(width, height), new Vector2f(0, height));
+
+        bounds = Rectangle.fromBottomLeft(0, 0, width, height);
     }
 
-    private Rectangle lastBounds = new Rectangle(0,0,0,0);
-    private float maxWidth = 0;
-    private float maxHeight = 0;
-    private float accumulatedWidth = 0;
-    private float accumulatedHeight = 0;
-
-    public void addBounds(Rectangle bounds) {
-        final float childWidth = bounds.width();
-        final float childHeight = bounds.height();
-        add(lastBounds, bounds);
-
-        accumulatedWidth += childWidth;
-        accumulatedHeight += childHeight;
-
-        if (maxWidth < childWidth) {
-            maxWidth = childWidth;
-        }
-
-        if (maxHeight < childHeight) {
-            maxHeight = childHeight;
-        }
-
-        lastBounds = bounds;
+    public Rectangle bounds() {
+        return bounds;
     }
 
-    @Override
-    public Rectangle bounds(C component) {
-        return calculateBounds();
+    public void setBackgroundColor(Color backgroundColor) {
+        this.backgroundColor = backgroundColor;
+    }
+
+    public void addChild(Component child) {
+        children.add(child);
+        updateBounds();
+    }
+    public void removeChild(Component child) {
+        children.remove(child);
+        updateBounds();
+    }
+
+    public void clearChildren() {
+        children.clear();
+        updateBounds();
     }
 }
