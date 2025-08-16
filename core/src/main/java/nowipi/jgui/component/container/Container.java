@@ -4,8 +4,7 @@ package nowipi.jgui.component.container;
 import nowipi.jgui.Color;
 import nowipi.jgui.component.Component;
 import nowipi.jgui.component.look.ComponentRenderer;
-import nowipi.primitives.Rectangle;
-import nowipi.primitives.Vector2f;
+import nowipi.jgui.component.util.Bounds;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,86 +15,120 @@ public class Container implements Component {
     private final List<Component> children;
     private Color backgroundColor;
     private final FlowDirection flowDirection;
-    private Rectangle bounds;
+    private final FlowBegin flowBegin;
+    private final Bounds bounds;
+
+    public Container(Color backgroundColor, FlowDirection flowDirection, FlowBegin flowBegin, Component ...children) {
+        this(backgroundColor, flowDirection, flowBegin, new ArrayList<>(Arrays.asList(children)));
+    }
 
     public Container(Color backgroundColor, FlowDirection flowDirection, Component ...children) {
-        this(backgroundColor, flowDirection, new ArrayList<>(Arrays.asList(children)));
+        this(backgroundColor, flowDirection, FlowBegin.START, new ArrayList<>(Arrays.asList(children)));
     }
 
     @SuppressWarnings("this-escape")
-    private Container(Color backgroundColor, FlowDirection flowDirection, List<Component> children) {
+    private Container(Color backgroundColor, FlowDirection flowDirection, FlowBegin flowBegin, List<Component> children) {
         this.children = children;
         this.backgroundColor = backgroundColor;
         this.flowDirection = flowDirection;
+        this.flowBegin = flowBegin;
+        bounds = new Bounds(0,0,0,0,0);
 
         updateBounds();
     }
 
+    private void moveToBegin(Bounds childBounds) {
+        switch (flowBegin) {
+            case START:
+                childBounds.moveXStart(bounds.xStart());
+                childBounds.moveYStart(bounds.yStart());
+                break;
+            case END:
+                childBounds.moveXEnd(bounds.xEnd());
+                childBounds.moveYEnd(bounds.yEnd());
+                break;
+        }
+    }
+
+    private void offset(Bounds childBounds, float calculatedWidth, float calculatedHeight) {
+        switch (flowDirection) {
+            case HORIZONTAL:
+                switch (flowBegin) {
+                    case START:
+                        childBounds.moveXStart(bounds.xStart() + calculatedWidth);
+                        break;
+                    case END:
+                        childBounds.moveXEnd(bounds.xEnd() - calculatedWidth);
+                        break;
+                }
+                break;
+
+            case VERTICAL:
+                switch (flowBegin) {
+                    case START:
+                        childBounds.moveYStart(bounds.yStart() + calculatedHeight);
+                        break;
+                    case END:
+                        childBounds.moveYEnd(bounds.yEnd() - calculatedHeight);
+
+                        break;
+                }
+                break;
+        }
+    }
+
+
+    public void updateBounds() {
+
+        float calculatedWidth = 0;
+        float calculatedHeight = 0;
+        for (Component child : children) {
+            Bounds childBounds = child.bounds();
+
+            moveToBegin(childBounds);
+            offset(childBounds, calculatedWidth, calculatedHeight);
+
+            if (child instanceof Container containerChild) {
+                containerChild.updateBounds();
+            }
+
+            float childWidth = childBounds.width();
+            float childHeight = childBounds.height();
+
+            switch (flowDirection) {
+                case HORIZONTAL:
+                    calculatedWidth += childWidth;
+                    calculatedHeight = Math.max(calculatedHeight, childHeight);
+                    break;
+                case VERTICAL:
+                    calculatedWidth = Math.max(calculatedWidth, childWidth);
+                    calculatedHeight += childHeight;
+                    break;
+            }
+        }
+
+        switch (flowBegin) {
+            case START:
+                bounds.setWidthFromStart(calculatedWidth);
+                bounds.setHeightFromStart(calculatedHeight);
+                break;
+            case END:
+                bounds.setWidthFromEnd(calculatedWidth);
+                bounds.setHeightFromEnd(calculatedHeight);
+                break;
+        }
+    }
+
     @Override
     public void draw(ComponentRenderer renderer) {
-        renderer.drawQuad(bounds, backgroundColor);
+        renderer.drawFilledBounds(bounds, backgroundColor);
         for (Component child : children) {
             child.draw(renderer);
         }
 
     }
 
-    private void add(Rectangle src, Rectangle dst) {
-        Vector2f addend = switch(flowDirection) {
-            case VERTICAL -> new Vector2f(0, src.height());
-            case HORIZONTAL -> new Vector2f(src.width(), 0);
-        };
-        dst.topLeft.add(addend);
-        dst.topRight.add(addend);
-        dst.bottomRight.add(addend);
-        dst.bottomLeft.add(addend);
-    }
-
-    public void updateBounds() {
-        float maxWidth = 0;
-        float maxHeight = 0;
-        float accumulatedWidth = 0;
-        float accumulatedHeight = 0;
-
-        Rectangle lastBounds = new Rectangle(0,0,0,0);
-        for (Component child : children) {
-
-            Rectangle childBounds = child.bounds();
-            final float childWidth = childBounds.width();
-            final float childHeight = childBounds.height();
-            add(lastBounds, childBounds);
-
-            accumulatedWidth += childWidth;
-            accumulatedHeight += childHeight;
-
-            if (maxWidth < childWidth) {
-                maxWidth = childWidth;
-            }
-
-            if (maxHeight < childHeight) {
-                maxHeight = childHeight;
-            }
-
-            lastBounds = childBounds;
-        }
-
-        float width = 0;
-        float height = 0;
-        switch (flowDirection) {
-            case VERTICAL -> {
-                width = maxWidth;
-                height = accumulatedHeight;
-            }
-            case HORIZONTAL -> {
-                width = accumulatedWidth;
-                height = maxHeight;
-            }
-        }
-
-        bounds = Rectangle.fromBottomLeft(0, 0, width, height);
-    }
-
-    public Rectangle bounds() {
+    public Bounds bounds() {
         return bounds;
     }
 

@@ -3,11 +3,11 @@ package nowipi.jgui.component.button;
 import nowipi.jgui.Color;
 import nowipi.jgui.Font;
 import nowipi.jgui.component.look.ComponentRenderer;
-import nowipi.primitives.Rectangle;
+import nowipi.jgui.component.util.Bounds;
 
 public abstract class Button extends ButtonComponent {
 
-    private final Rectangle bounds;
+    private final Bounds bounds;
     private String text;
     private Font font;
     private final Color backgroundColor;
@@ -28,7 +28,7 @@ public abstract class Button extends ButtonComponent {
     }
 
     public Button(String text, Font font, Color backgroundColor, Color pressedBackgroundColor, Color hoveredBackgroundColor, Color textColor, Color pressedTextColor, Color hoveredTextColor) {
-        this.bounds = Rectangle.fromBottomLeft(0, 0, font.stringWidth(text), font.size());
+        this.bounds = new Bounds(0, font.stringWidth(text), 0, font.size(), 0);
         this.text = text;
         this.font = font;
         this.backgroundColor = backgroundColor;
@@ -41,7 +41,7 @@ public abstract class Button extends ButtonComponent {
 
     @Override
     public void draw(ComponentRenderer renderer) {
-        renderer.drawQuad(bounds, getCurrentBackgroundColor());
+        renderer.drawFilledBounds(bounds, getCurrentBackgroundColor());
     }
 
     private Color getCurrentBackgroundColor() {
@@ -69,17 +69,7 @@ public abstract class Button extends ButtonComponent {
         return textColor;
     }
 
-    private void growFromLeft(float amount) {
-        bounds.topRight.x = bounds.topLeft.x + amount;
-        bounds.bottomRight.x = bounds.bottomLeft.x + amount;
-    }
-
-    private void growFromBottom(float amount) {
-        bounds.topLeft.y = bounds.bottomLeft.y + amount;
-        bounds.topRight.y = bounds.bottomRight.y + amount;
-    }
-
-    public Rectangle bounds() {
+    public Bounds bounds() {
         return bounds;
     }
 
@@ -90,7 +80,7 @@ public abstract class Button extends ButtonComponent {
     public void setText(String text) {
         this.text = text;
 
-        growFromLeft(font.stringWidth(text));
+        bounds.setWidthFromStart(font.stringWidth(text));
     }
 
     public Font font() {
@@ -100,7 +90,7 @@ public abstract class Button extends ButtonComponent {
     public void setFont(Font font) {
         this.font = font;
 
-        growFromBottom(font.size());
-        growFromLeft(font.stringWidth(text));
+        bounds.setWidthFromStart(font.stringWidth(text));
+        bounds.setHeightFromStart(font.size());
     }
 }

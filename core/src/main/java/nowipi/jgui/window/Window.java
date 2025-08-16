@@ -1,10 +1,10 @@
 package nowipi.jgui.window;
 
+import nowipi.jgui.Rectangle;
 import nowipi.jgui.input.keyboard.KeyboardEventListener;
 import nowipi.jgui.window.event.WindowEventListener;
 import nowipi.jgui.windows.window.Win32WindowProvider;
 import nowipi.jgui.window.event.WindowMouseListener;
-import nowipi.primitives.Rectangle;
 
 public interface Window extends Disposable {
 

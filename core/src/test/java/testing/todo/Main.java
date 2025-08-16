@@ -1,11 +1,11 @@
 package testing.todo;
 
+import nowipi.jgui.Rectangle;
 import nowipi.jgui.component.look.ComponentRenderer;
 import nowipi.jgui.rendering.OpenGL;
 import nowipi.jgui.window.Window;
 import nowipi.opengl.OpenGLGraphicsContext;
 import nowipi.primitives.Matrix4f;
-import nowipi.primitives.Rectangle;
 
 final class Main {
     public static void main(String[] args) {
@@ -14,9 +14,11 @@ final class Main {
 
         Todo todo = new Todo();
         todo.addItem("Rendering");
+        todo.bounds().moveXStart(100);
+        todo.updateBounds();
 
         Rectangle windowBounds = window.bounds();
-        ComponentRenderer renderer = new ComponentRenderer(calculateProjectionMatrix((int) windowBounds.width(), (int) windowBounds.height()), gc);
+        ComponentRenderer renderer = new ComponentRenderer(calculateProjectionMatrix(windowBounds.width(), windowBounds.height()), gc);
 
         window.addListener((width, height) -> {
             gc.glViewport(0, 0, width, height);

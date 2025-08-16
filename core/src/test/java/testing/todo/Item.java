@@ -19,8 +19,7 @@ final class Item extends Container {
         this(text, new Checkbox(text.font()) {
             @Override
             public void check() {
-                text.font().setStrikethrough(true);
-                text.setFont(text.font());
+                text.setFont(Font.FontBuilder.from(text.font()).strikethrough(true).build());
                 super.check();
             }
         });

@@ -12,7 +12,7 @@ import nowipi.jgui.component.textinput.TextInput;
 
 final class Todo extends Container {
 
-    private static final Font FONT = new Font(20);
+    private static final Font FONT = new Font.FontBuilder().size(16).build();
 
     private final TextInput itemTextInput;
     private final MouseInteractionListener listener;

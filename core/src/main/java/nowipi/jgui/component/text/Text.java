@@ -4,27 +4,19 @@ package nowipi.jgui.component.text;
 import nowipi.jgui.Color;
 import nowipi.jgui.Font;
 import nowipi.jgui.component.look.ComponentRenderer;
-import nowipi.primitives.Rectangle;
+import nowipi.jgui.component.util.Bounds;
 
 public class Text extends TextComponent {
 
-    private final Rectangle bounds;
+    private final Bounds bounds;
     private Font font;
     private Color color;
 
     public Text(String string, Font font, Color color) {
         super(string);
-        bounds = Rectangle.fromBottomLeft(0, 0, font.stringWidth(string), font.size());
+        bounds = new Bounds(0, font.stringWidth(string), 0, font.size(), 0);
         this.font = font;
         this.color = color;
-    }
-
-    public void growFromBottomLeft(float width, float height) {
-        bounds.topRight.x = bounds.topLeft.x + width;
-        bounds.bottomRight.x = bounds.bottomLeft.x + width;
-
-        bounds.topLeft.y = bounds.bottomLeft.y + height;
-        bounds.topRight.y = bounds.bottomRight.y + height;
     }
 
     @Override
@@ -33,7 +25,7 @@ public class Text extends TextComponent {
     }
 
     @Override
-    public Rectangle bounds() {
+    public Bounds bounds() {
         return bounds;
     }
 
@@ -43,7 +35,8 @@ public class Text extends TextComponent {
 
     public void setFont(Font font) {
         this.font = font;
-        growFromBottomLeft(font.stringWidth(string()), font.size());
+        bounds.setWidthFromStart(font.stringWidth(string()));
+        bounds.setHeightFromStart(font.size());
     }
 
     public Color color() {

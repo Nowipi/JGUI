@@ -1,49 +1,53 @@
 package nowipi.jgui;
 
-public class Font {
-
-    private boolean italic;
-    private boolean strikethrough;
-    private boolean bold;
-    private int size;
-
-    public Font(int size) {
-        this.size = size;
-    }
+public record Font(boolean italic, boolean strikethrough, boolean bold, int size) {
 
     public int stringWidth(String text) {
         return size * text.length();
     }
 
-    public boolean italic() {
-        return italic;
+    public static class FontBuilder {
+        private boolean italic, strikethrough, bold;
+        private int size;
+
+        public FontBuilder() {
+        }
+
+        private FontBuilder(boolean italic, boolean strikethrough, boolean bold, int size) {
+            this.italic = italic;
+            this.strikethrough = strikethrough;
+            this.bold = bold;
+            this.size = size;
+        }
+
+        public static FontBuilder from(Font font) {
+            return new FontBuilder(font.italic(),  font.strikethrough(), font.bold(), font.size());
+        }
+
+        public FontBuilder italic(boolean italic) {
+            this.italic = italic;
+            return this;
+        }
+
+        public FontBuilder strikethrough(boolean strikethrough) {
+            this.strikethrough = strikethrough;
+            return this;
+        }
+
+        public FontBuilder bold(boolean bold) {
+            this.bold = bold;
+            return this;
+        }
+
+        public FontBuilder size(int size) {
+            this.size = size;
+            return this;
+        }
+
+        public Font build() {
+            return new Font(italic, strikethrough, bold, size);
+        }
+
     }
 
-    public void setItalic(boolean italic) {
-        this.italic = italic;
-    }
-
-    public boolean strikethrough() {
-        return strikethrough;
-    }
-
-    public void setStrikethrough(boolean strikethrough) {
-        this.strikethrough = strikethrough;
-    }
-
-    public boolean bold() {
-        return bold;
-    }
-
-    public void setBold(boolean bold) {
-        this.bold = bold;
-    }
-
-    public int size() {
-        return size;
-    }
-
-    public void setSize(int size) {
-        this.size = size;
-    }
 }

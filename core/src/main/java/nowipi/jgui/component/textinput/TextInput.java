@@ -3,37 +3,29 @@ package nowipi.jgui.component.textinput;
 import nowipi.jgui.Color;
 import nowipi.jgui.Font;
 import nowipi.jgui.component.look.ComponentRenderer;
-import nowipi.primitives.Rectangle;
+import nowipi.jgui.component.util.Bounds;
 
 public class TextInput extends TextInputComponent {
 
-    private final Rectangle bounds;
+    private final Bounds bounds;
     private Font font;
     private Color backgroundColor;
     private Color textColor;
 
     public TextInput(Font font, Color backgroundColor, Color textColor) {
-        bounds = Rectangle.fromBottomLeft(0, 0, 10, font.size());
+        bounds = new Bounds(0, 10, 0, font.size(), 0);
         this.font = font;
         this.backgroundColor = backgroundColor;
         this.textColor = textColor;
     }
 
-    public void growFromBottomLeft(float width, float height) {
-        bounds.topRight.x = bounds.topLeft.x + width;
-        bounds.bottomRight.x = bounds.bottomLeft.x + width;
-
-        bounds.topLeft.y = bounds.bottomLeft.y + height;
-        bounds.topRight.y = bounds.bottomRight.y + height;
-    }
-
     @Override
     public void draw(ComponentRenderer renderer) {
-        renderer.drawQuad(bounds, backgroundColor);
+        renderer.drawFilledBounds(bounds, backgroundColor);
     }
 
     @Override
-    public Rectangle bounds() {
+    public Bounds bounds() {
         return bounds;
     }
 
@@ -44,7 +36,8 @@ public class TextInput extends TextInputComponent {
     public void setFont(Font font) {
         this.font = font;
 
-        growFromBottomLeft(font.stringWidth(input()), font.size());
+        bounds.setWidthFromStart(font().stringWidth(input()));
+        bounds.setHeightFromStart(font.size());
     }
 
     public Color backgroundColor() {

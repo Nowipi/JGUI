@@ -1,8 +1,8 @@
 package testing;
 
+import nowipi.jgui.Rectangle;
 import nowipi.jgui.rendering.OpenGL;
 import nowipi.jgui.window.Window;
-import nowipi.primitives.Rectangle;
 
 import static nowipi.opengl.OpenGL.*;
 
@@ -26,8 +26,8 @@ final class WindowChangeTest {
         gc.dispose();
 
         Rectangle firstBounds = firstWindow.bounds();
-        Window secondWindow = Window.createBorderless(firstWindow.title(), (int) firstBounds.width(), (int) firstBounds.height());
-        secondWindow.setTopLeft((int) firstBounds.topLeft.x, (int) firstBounds.topLeft.y);
+        Window secondWindow = Window.createBorderless(firstWindow.title(), firstBounds.width(), firstBounds.height());
+        secondWindow.setTopLeft(firstBounds.left(), firstBounds.top());
 
 
         firstWindow.close();

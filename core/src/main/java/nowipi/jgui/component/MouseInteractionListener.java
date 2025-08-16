@@ -9,8 +9,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static nowipi.jgui.component.RectUtils.isInside;
-
 public class MouseInteractionListener implements WindowMouseListener {
 
     private record RegisteredElement(Component component, MouseInteraction interaction) {
@@ -29,7 +27,7 @@ public class MouseInteractionListener implements WindowMouseListener {
             var bounds = element.component().bounds();
 
             MouseInteraction interaction = element.interaction;
-            if (isInside(windowClientAreaX, windowClientAreaY, bounds)) {
+            if (bounds.isInside(windowClientAreaX, windowClientAreaY)) {
                 interaction.mousePress(windowClientAreaX, windowClientAreaY);
             }
         }
@@ -41,7 +39,7 @@ public class MouseInteractionListener implements WindowMouseListener {
             var bounds = element.component().bounds();
 
             MouseInteraction interaction = element.interaction;
-            if (isInside(windowClientAreaX, windowClientAreaY, bounds)) {
+            if (bounds.isInside(windowClientAreaX, windowClientAreaY)) {
                 interaction.mouseRelease(windowClientAreaX, windowClientAreaY);
             }
         }
@@ -55,7 +53,7 @@ public class MouseInteractionListener implements WindowMouseListener {
             var bounds = element.component().bounds();
 
             MouseInteraction interaction = element.interaction;
-            if (isInside(windowClientAreaX, windowClientAreaY, bounds)) {
+            if (bounds.isInside(windowClientAreaX, windowClientAreaY)) {
                 if (!enteredElements.contains(element)) {
                     enteredElements.add(element);
                     interaction.mouseEnter(windowClientAreaX, windowClientAreaY);

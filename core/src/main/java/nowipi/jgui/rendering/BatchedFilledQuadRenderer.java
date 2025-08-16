@@ -2,7 +2,6 @@ package nowipi.jgui.rendering;
 
 import nowipi.opengl.OpenGLGraphicsContext;
 import nowipi.primitives.Matrix4f;
-import nowipi.primitives.Quad;
 import nowipi.primitives.Vector2f;
 
 import java.lang.foreign.MemorySegment;
@@ -11,20 +10,20 @@ import java.util.List;
 
 import static nowipi.opengl.OpenGL.*;
 
-public final class BatchedQuadRenderer implements Renderer {
+public final class BatchedFilledQuadRenderer implements Renderer {
 
     private final int shader;
     private final int projectionUniformLocation;
 
-    private record QuadDrawCommand(Quad quad, float r, float g, float b, float a) {}
+    private record VerticesDrawCommand(Vector2f[] vertices, float r, float g, float b, float a) {}
 
     private final OpenGLGraphicsContext gc;
     private final int VAO;
     private final int VBO;
     private final int EBO;
-    private final List<QuadDrawCommand> quads;
+    private final List<VerticesDrawCommand> drawCommands;
 
-    public BatchedQuadRenderer(Matrix4f projectionMatrix, OpenGLGraphicsContext gc) {
+    public BatchedFilledQuadRenderer(Matrix4f projectionMatrix, OpenGLGraphicsContext gc) {
 
         int vertexShader = gc.glCreateShader(OpenGL.GL_VERTEX_SHADER);
         String source = """
@@ -73,7 +72,7 @@ public final class BatchedQuadRenderer implements Renderer {
 
         this.gc = gc;
 
-        quads = new ArrayList<>(10);
+        drawCommands = new ArrayList<>(10);
 
         setProjection(projectionMatrix);
 
@@ -95,37 +94,29 @@ public final class BatchedQuadRenderer implements Renderer {
         gc.glBindVertexArray(0);
     }
 
-    /**
-     * Draws a quad to the screen.
-     * @param quad the quad in screen coordinates
-     * @param r
-     * @param g
-     * @param b
-     * @param a
-     */
-    public void drawQuad(Quad quad, float r, float g, float b, float a) {
-        if (quad == null)
+    public void drawVertices(Vector2f[] vertices, float r, float g, float b, float a) {
+        if (vertices == null)
             return;
-        quads.add(new QuadDrawCommand(quad, r, g, b, a));
+        drawCommands.add(new VerticesDrawCommand(vertices, r, g, b, a));
     }
 
     @Override
     public void beginFrame() {
-        quads.clear();
+        drawCommands.clear();
     }
 
     @Override
     public void endFrame() {
 
-        int rectangleCount = quads.size();
+        int rectangleCount = drawCommands.size();
         float[] vertexData = new float[rectangleCount * 6 * 4];
         int[] indexData = new int[rectangleCount * 6];
         int vertexDataIndex = 0;
         int indexDataIndex = 0;
-        for (int i = 0; i < quads.size(); i++) {
-            var command = quads.get(i);
+        for (int i = 0; i < drawCommands.size(); i++) {
+            var command = drawCommands.get(i);
 
-            for (Vector2f vertex : command.quad.vertices()) {
+            for (Vector2f vertex : command.vertices()) {
                 vertexData[vertexDataIndex++] = vertex.x;
                 vertexData[vertexDataIndex++] = vertex.y;
                 vertexData[vertexDataIndex++] = command.r();

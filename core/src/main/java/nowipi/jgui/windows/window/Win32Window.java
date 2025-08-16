@@ -1,5 +1,6 @@
 package nowipi.jgui.windows.window;
 
+import nowipi.jgui.Rectangle;
 import nowipi.jgui.event.EventDispatcher;
 import nowipi.jgui.input.keyboard.KeyboardEventListener;
 import nowipi.jgui.window.event.WindowEventListener;
@@ -12,7 +13,6 @@ import nowipi.jgui.windows.ffm.gdi.PIXELFORMATDESCRIPTOR;
 import nowipi.jgui.windows.ffm.user32.MSG;
 import nowipi.jgui.windows.ffm.user32.RECT;
 import nowipi.jgui.windows.ffm.user32.User32;
-import nowipi.primitives.Rectangle;
 
 import java.lang.foreign.*;
 import java.nio.charset.StandardCharsets;
